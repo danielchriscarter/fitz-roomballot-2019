@@ -61,6 +61,7 @@ class Layout {
 					<li><a href="guide">Ballot Guide</a></li>
 					<li><a href="rooms">Rooms in the Ballot</a></li>
 					<li><a href="houses">Houses in the Ballot</a></li>
+          <li><a href="groups">Ballot Group Selection</a></li>
 				</ul>
 			</div><!-- /.navbar-collapse -->
 		  </div><!-- /.container-fluid -->

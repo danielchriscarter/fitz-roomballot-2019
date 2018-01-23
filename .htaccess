@@ -1,3 +1,11 @@
+RewriteEngine On
+RewriteCond %{HTTP_HOST}   roomballot.fitzjcr.com$
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://roomballot.fitzjcr.com/$1 [L,NC,R=301]
+
+php_value memory_limit 4G
+php_value allow_url_fopen On
+
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
