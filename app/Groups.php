@@ -1,14 +1,15 @@
 <?php
-
 class Groups {
 
-    public static function HTMLtop() {
+    public static function HTMLtop($user) {
 ?>
       <div class="container">
-        <form action="" method="GET">
-          <input type="submit" name="join" value="Join a Group" /> 
-          <input type="submit" name="create" value="Create a Group" /> 
-        </form>
+        <h2>Welcome, <?= $user->getCRSID(); ?></h2>
+        <p>
+          You are currently part of the group <a href='?view=<?= $user->getGroupId(); ?>'>"<?= $user->getGroupName(); ?>"</a><br />
+          <a href='?leave'>Leave this Group</a><br />
+          <a href='?create'>Create a new Group</a>
+        </p>
 <?php
     }
 
@@ -24,12 +25,22 @@ class Groups {
       }
     }
 
-    public static function HTMLgroupView($result){
+    public static function HTMLgroupView($user, $result){
+      if($result->num_rows == 0){ ?>
+        <h2>No group found</h2>       
+<?
+      }
       $first = true;
       while($row = $result->fetch_assoc()){
         if($first){ ?>
-          <h2><?= $row['groupname']; ?></h2> 
-          <a href='/groups?join&id=<?= $row['groupid'] ?>'>Request to Join</a>
+          <h2><?= htmlentities($row['groupname']); ?></h2> 
+<?
+          if($user->getGroupId() != intval($row['groupid'])){
+?>
+            <a href='/groups?join&id=<?= $row['groupid'] ?>'>Request to Join</a>
+<?
+          }
+?>
           <h3>Members</h3>
           <table class="table table-condensed table-bordered table-hover">
             <thead>
@@ -51,12 +62,19 @@ class Groups {
       </table>
 <?
     }
-    public static function HTMLjoin(){
-      echo "Test";
+    public static function HTMLjoin(){ ?>
+
+<?
     }
 
-    public static function HTMLcreate(){
-      echo "TestyTest";
+    public static function HTMLcreate(){ ?>
+      <h2>Create a New Group</h2>
+      <form action="" method="POST">
+        <input name="groupname" type="text" placeholder="Group Name" /><br />
+        <label for="public">Make this group visible publically?</label> <input name="public" type="checkbox" value="false" /><br />
+        <input type="submit" value="Create Group" />
+      </form>
+<?
     }
 
 
@@ -75,7 +93,7 @@ class Groups {
             while ($row = $result->fetch_assoc()) {
 ?>
               <tr>
-                <td><a href='/groups?view=<?= $row['id'] ?>'><?= $row['name']; ?></a></td>
+                <td><a href='/groups?view=<?= $row['id'] ?>'><?= htmlentities($row['name']); ?></a></td>
                 <td><?= $row['size']; ?></td>
                 <td><a href='/groups?join&id=<?= $row['id']; ?>'>Request to Join</a></td>
               </tr>

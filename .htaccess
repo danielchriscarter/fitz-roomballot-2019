@@ -10,3 +10,11 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+
+AuthType Ucam-WebAuth
+
+AuthGroupFile /home/societies/fitzjcr/AuthGroups
+AACookieKey "euNcyvUPvo36bgcKBfHVsVGvFUzLYZbmzXyjXk7TidsEVssT92DFLNWtXnhgaseu"
+
+Require valid-user
+AADescription "Fitz JCR Group Balloting System"

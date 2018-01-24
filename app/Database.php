@@ -55,7 +55,7 @@ class Database {
                     break;
             }
         }
-        $table = self::$prefix . $table;
+        $table = $this->prefix . $table;
         $result = self::query("INSERT INTO `" . $table . "` (`" . implode("`, `", $rows) . "`) VALUES (" . implode(", ", $vals) . ");");
         return $result ? true : false;
     }
@@ -82,19 +82,19 @@ class Database {
             }
             $pairs[] = "`" . $rows[$i] . "` = " . $vals[$i];
         }
-        $table = self::$prefix . $table;
+        $table = $this->prefix . $table;
         $result = self::query("UPDATE `" . $table . "` SET " . implode(", ", $pairs) . ($where ? " WHERE " . $where : "") . ";");
         return $result ? true : false;
     }
 
     public function delete($table, $where) {
-        $table = self::$prefix . $table;
+        $table = $this->prefix . $table;
         $result = self::query("DELETE FROM `" . $table . "`" . ($where ? " WHERE " . $where : "") . ";");
         return $result ? true : false;
     }
 
     public function fetch($table, $where=null, $sort=null, $limit=array(0, 1000)) {
-        $table = self::$prefix . $table;
+        $table = $this->prefix . $table;
         // define a string to store our SQL query
         $conds = "";
         if ($where) {
