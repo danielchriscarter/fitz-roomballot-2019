@@ -29,7 +29,7 @@ class User {
     if($result->num_rows > 0){ //User exists in DB
       $this->data = $result->fetch_assoc();
     }else{ //Create user in DB with individual group
-
+      
     }
   }
 
@@ -55,27 +55,20 @@ class User {
     $db = Database::getInstance();
     
     $oldGroup = $db->fetch("ballot_groups", "`id`='".$this->data['groupid']."'");
-
+    $queries = [];
+    
     $db->query("START TRANSACTION");
     if(count($oldGroup) > 0){
       if(intval($oldGroup[0]['size']) == 1){
-        $result1 = $db->delete("ballot_groups", "`id`='".$this->data['groupid']."'");
+        $queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
       }else{
-        $result1 = $db->query("UPDATE `ballot_groups` SET `size` = `size`-1 WHERE `id`='".$this->data['groupid']."'");
+        $queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
       }
-    }else{
-      $result1 = true; //Somehow, the old group doesn't exist.
     }
 
-    $result2 = $db->query("UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='$gid'");
-    $result3 = $db->query("UPDATE `ballot_individuals` SET `groupid`='$gid' WHERE `id`='".$this->data['id']."'");
+    $queries[] = "UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='$gid'";
+    $queries[] = "UPDATE `ballot_individuals` SET `groupid`='$gid' WHERE `id`='".$this->data['id']."'";
     
-    if($result1 && $result2 && $result3){
-      $db->query("COMMIT");  
-      return true;
-    }else{
-      $db->query("ROLLBACK");
-      return false;
-    }
+    return $db->transaction($queries);
   }
 }
