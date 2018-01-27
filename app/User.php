@@ -29,7 +29,43 @@ class User {
     if($result->num_rows > 0){ //User exists in DB
       $this->data = $result->fetch_assoc();
     }else{ //Create user in DB with individual group
-      
+      $db = Database::getInstance();
+
+      //Populate data
+      $this->data['id'] = random_int(0, PHP_INT_MAX);
+      $this->data['searching'] = false;
+      $this->data['groupid'] = 0;
+      $this->data['groupname'] = $this->crsid;
+
+      $insertSuccess = $db->insert("ballot_individuals", [
+        "id"=>$this->getID(),
+        "crsid"=>$this->crsid,
+        "groupid"=>false,
+        "searching"=>false
+      ]);
+
+      if(!$insertSuccess){
+        throw new Exception("Error adding user to database");
+      }
+
+      //Create a new individual group for this user
+      $groupId = random_int(1, PHP_INT_MAX);
+      $result = Database::getInstance()->insert("ballot_groups", [
+        "id" => $groupId,
+        "name" => $this->crsid,
+        "owner" => $this->getID(),
+        "public" => false,
+        "individual" => true,
+        "size" => 0
+      ]);
+
+      if(!$result){
+        throw new Exception("Error creating group for new user");
+      }
+
+      if(!$this->moveToGroup($groupId)){
+        throw new Exception("Error moving new user to individual group");
+      }
     }
   }
 
@@ -59,10 +95,12 @@ class User {
     
     $db->query("START TRANSACTION");
     if(count($oldGroup) > 0){
-      if(intval($oldGroup[0]['size']) == 1){
-        $queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
-      }else{
-        $queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
+      if(intval($oldGroup[0]['id']) != 0){ //Don't do this for the 0 group
+        if(intval($oldGroup[0]['size']) == 1){
+          $queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
+        }else{
+          $queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
+        }
       }
     }
 

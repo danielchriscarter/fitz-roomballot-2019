@@ -74,7 +74,7 @@ class Content {
 <?
             //Do create operation
 
-            $newGroupId = random_int(0, PHP_INT_MAX);
+            $newGroupId = random_int(1, PHP_INT_MAX);
             //Create group
             $result = Database::getInstance()->insert("ballot_groups", [
               "id" => $newGroupId,
