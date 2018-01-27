@@ -117,6 +117,20 @@ class Database {
         }
         return $data;
     }
+
+    public function transaction($queries){
+      self::query("START TRANSACTION");
+
+      foreach($queries as $q){
+        if( !self::query($q) ){
+          self::query("ROLLBACK");
+          return false;
+        }
+      }
+
+      self::query("COMMIT");
+      return true;
+    }
 }
 
 ?>
