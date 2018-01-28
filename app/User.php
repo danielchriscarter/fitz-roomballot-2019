@@ -93,7 +93,9 @@ class User {
     $oldGroup = $db->fetch("ballot_groups", "`id`='".$this->data['groupid']."'");
     $queries = [];
     
-    $db->query("START TRANSACTION");
+    $queries[] = "UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='$gid'";
+    $queries[] = "UPDATE `ballot_individuals` SET `groupid`='$gid' WHERE `id`='".$this->data['id']."'";
+
     if(count($oldGroup) > 0){
       if(intval($oldGroup[0]['id']) != 0){ //Don't do this for the 0 group
         if(intval($oldGroup[0]['size']) == 1){
@@ -104,8 +106,6 @@ class User {
       }
     }
 
-    $queries[] = "UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='$gid'";
-    $queries[] = "UPDATE `ballot_individuals` SET `groupid`='$gid' WHERE `id`='".$this->data['id']."'";
     
     return $db->transaction($queries);
   }

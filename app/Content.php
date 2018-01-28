@@ -64,10 +64,10 @@ class Content {
 
         if(isset($_GET['join'])){
           if(isset($_GET['id'])){
-            //Do join operation
-          }else{
-            Groups::HTMLjoin();
+            //Do join request operation
           }
+        }else if(isset($_GET['leave'])){
+
         }else if(isset($_GET['create'])){
           if(isset($_POST['groupname'])){ ?>
             <div class='container'>
