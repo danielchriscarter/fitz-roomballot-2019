@@ -19,7 +19,7 @@ class User {
 
     //Get user data from DB (e.g group ID)
     $queryString = 
-      "SELECT `ballot_individuals`.`id` as `id`,`searching`,`groupid`,`name` as `groupname`, `individual`
+      "SELECT `ballot_individuals`.`id` as `id`,`searching`,`groupid`,`name` as `groupname`, `individual`, `requesting`
        FROM `ballot_individuals` 
        JOIN `ballot_groups` 
        ON `groupid` = `ballot_groups`.`id`
@@ -49,7 +49,7 @@ class User {
       }
 
       //Create a new individual group for this user
-      $groupId = random_int(1, PHP_INT_MAX);
+      $groupId = random_int(0, PHP_INT_MAX);
       $result = Database::getInstance()->insert("ballot_groups", [
         "id" => $groupId,
         "name" => $this->crsid,
@@ -88,6 +88,14 @@ class User {
     return intval($this->data['id']);
   }
 
+  public function getRequestingGroupId(){
+    if($this->data['requesting'] != ""){
+      return intval($this->data['requesting']);
+    }else{
+      return null;
+    }
+  }
+
   public function moveToGroup($gid){
     //Decrement current group size, increment new group size, update group ID field
     //If group will be empty, remove it
@@ -100,12 +108,10 @@ class User {
     $queries[] = "UPDATE `ballot_individuals` SET `groupid`='$gid' WHERE `id`='".$this->data['id']."'";
 
     if(count($oldGroup) > 0){
-      if(intval($oldGroup[0]['id']) != 0){ //Don't do this for the 0 group
-        if(intval($oldGroup[0]['size']) == 1){
-          $queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
-        }else{
-          $queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
-        }
+      if(intval($oldGroup[0]['size']) == 1){
+        $queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
+      }else{
+        $queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
       }
     }
 

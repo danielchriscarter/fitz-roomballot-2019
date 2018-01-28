@@ -17,6 +17,11 @@ class Groups {
             You are currently balloting alone.<br />
 <?
           }
+
+          if($user->getRequestingGroupId()){ ?>
+            <a href='?view=<?= $user->getRequestingGroupId(); ?>'>You are currently requesting access to this group</a><br />
+<?
+          }
 ?>
           <a href='?create'>Create a new Group</a>
         </p>
