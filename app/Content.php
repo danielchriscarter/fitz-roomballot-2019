@@ -72,15 +72,12 @@ class Content {
             ]);
             $gpinfo = Database::getInstance()->fetch("ballot_groups", "`id`='$_GET[id]'");
             $owner = new User($gpinfo[0]['owner']);
-            mail(
-              $owner->getEmail(), 
-              $user->getCRSID()." has requested to join your ballot group ".$owner->getGroupName(),
-              "Click <a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroupId()."'>here to accept this request</a>",
-              "MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1\r\n"
+            $owner->sendEmail(
+              $user->getCRSID()." has requested to join your ballot group '".$owner->getGroupName()."'",
+              "Click <a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroupId()."'>here to accept this request</a>"
             );
-
             if($success){ ?>
-              <b>You have succesfully requested to join <a href='?view=<?= $_GET['id']; ?>'><?= $gpinfo[0]['name']; ?></a></b>
+              <b>You have succesfully requested to join <a href='?view=<?= $_GET['id']; ?>'><?= htmlentities($gpinfo[0]['name']); ?></a></b>
 <?
             }else{ ?>
               <b>There was a problem requesting access to this group</b>
@@ -103,7 +100,12 @@ class Content {
          
           if($result->num_rows > 0){
             //Move user to group
-            if($toAccept->moveToGroup($groupID)){ ?>
+            if($toAccept->moveToGroup($groupID)){ 
+              $toAccept->sendEmail(
+                "You've been accepted into the ballot group '".$user->getEscapedGroupName()."'",
+                "Click <a href='https://roomballot.fitzjcr.com/groups?view=".$user->getGroupId()."'>here</a> to go to the group."
+              );
+            ?>
               <b>You have accepted <?= $toAccept->getCRSID(); ?> into your group.</b>             
 <?
             }
@@ -129,7 +131,8 @@ class Content {
           if($result && $user->moveToGroup($groupId)){ ?>
             <b>You're now balloting alone. <a href='/groups'>Go back to Groups page</a></b>
 <?
-          }else{ ?>
+          }else{ 
+            echo Database::getInstance()->error(); ?>
             <b>There was a problem leaving the group, please try again</b>
 <?
           }

@@ -9,7 +9,7 @@ class Groups {
 <?
           if(!$user->isIndividual()){
 ?>
-            You are currently part of the group <a href='?view=<?= $user->getGroupId(); ?>'>"<?= $user->getGroupName(); ?>"</a><br />
+            You are currently part of the group <a href='?view=<?= $user->getGroupId(); ?>'>"<?= $user->getEscapedGroupName(); ?>"</a><br />
             <a href='?leave'>Leave this Group</a><br />
 <?
           }else{

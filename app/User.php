@@ -140,4 +140,17 @@ class User {
 
     return $db->transaction($queries);
   }
+
+  public function sendEmail($subject, $body){
+    mail(
+      $this->getEmail(), 
+      $subject,
+      $body,
+      "MIME-Version: 1.0\r\nContent-type: text/html; charset=utf-8\r\n"
+    );
+  }
+
+  public function getEscapedGroupName(){
+    return htmlentities($this->getGroupName());
+  }
 }
