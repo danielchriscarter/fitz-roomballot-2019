@@ -5,6 +5,11 @@ This is the repository for Fitzwilliam College JCR's online Room & Housing Ballo
 
 The app itself is written in PHP and is designed to run on the SRCF's web server, but in theory it should be easily deployed elsewhere too.
 
+Usage
+----
+
+Make required changes in .htaccess-example and app/example-Environment.php, then remove the "example" part
+
 Contributing
 ----
 
