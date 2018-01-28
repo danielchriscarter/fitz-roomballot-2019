@@ -47,7 +47,8 @@ class Groups {
       }
       $first = true;
       while($row = $result->fetch_assoc()){
-        if($first){ ?>
+        if($first){ 
+          $first = false; ?>
           <h2><?= htmlentities($row['groupname']); ?></h2> 
 <?
           //Only show request link if not currently in the group, or requesting access

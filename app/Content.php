@@ -87,6 +87,30 @@ class Content {
 <?
             }
           }
+        }else if(isset($_GET['accept'])){
+          Groups::HTMLtop($user);
+
+          $toAccept = new User($_GET['accept']);
+          $groupID = intval($_GET['group']);
+
+          //Check, within the query, whether all of the requirements are true.
+          $dbQuery =
+            "SELECT * FROM `ballot_individuals`
+             JOIN `ballot_groups` ON `requesting`=`ballot_groups`.`id`
+             WHERE `owner`='".$user->getId()."' AND `requesting`='$groupID' AND `ballot_individuals`.`id`='".$toAccept->getId()."'";
+
+          $result = Database::getInstance()->query($dbQuery);
+         
+          if($result->num_rows > 0){
+            //Move user to group
+            if($toAccept->moveToGroup($groupID)){ ?>
+              <b>You have accepted <?= $toAccept->getCRSID(); ?> into your group.</b>             
+<?
+            }
+          }else{ ?>
+            <b>There was a problem accepting the request - they may no longer be requesting access, or you might not have permission to accept requests</b>     
+<?
+          }
         }else if(isset($_GET['leave'])){ ?>
           <div class='container'>
 <?
