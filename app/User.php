@@ -49,13 +49,15 @@ class User {
       //Populate data
       $this->data['id'] = random_int(0, PHP_INT_MAX);
       $this->data['searching'] = false;
-      $this->data['groupid'] = 0;
+      $this->data['groupid'] = null;
       $this->data['groupname'] = $this->crsid;
+      $this->data['individual'] = true;
+      $this->data['requesting'] = null;
 
       $insertSuccess = $db->insert("ballot_individuals", [
         "id"=>$this->getID(),
         "crsid"=>$this->crsid,
-        "groupid"=>false,
+        "groupid"=>null,
         "searching"=>false
       ]);
 
@@ -120,17 +122,19 @@ class User {
     //If group will be empty, remove it
     $db = Database::getInstance();
     
-    $oldGroup = $db->fetch("ballot_groups", "`id`='".$this->data['groupid']."'");
     $queries = [];
     
     $queries[] = "UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='$gid'";
     $queries[] = "UPDATE `ballot_individuals` SET `groupid`='$gid',`requesting`=NULL WHERE `id`='".$this->data['id']."'";
 
-    if(count($oldGroup) > 0){
-      if(intval($oldGroup[0]['size']) == 1){
-        $queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
-      }else{
-        $queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
+    if($this->data['groupid'] != null){
+      $oldGroup = $db->fetch("ballot_groups", "`id`='".$this->data['groupid']."'");
+      if(count($oldGroup) > 0){
+          if(intval($oldGroup[0]['size']) == 1){
+            $queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
+          }else{
+            $queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
+          }
       }
     }
 

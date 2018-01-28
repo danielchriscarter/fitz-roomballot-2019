@@ -75,7 +75,8 @@ class Content {
             mail(
               $owner->getEmail(), 
               $user->getCRSID()." has requested to join your ballot group ".$owner->getGroupName(),
-              "Click <a href='?accept=".$user->getId()."&group=".$owner->getGroupId()."'>here to accept this request</a>"
+              "Click <a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroupId()."'>here to accept this request</a>",
+              "MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1\r\n"
             );
 
             if($success){ ?>
