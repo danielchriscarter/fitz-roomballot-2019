@@ -9,12 +9,26 @@ class User {
   protected $crsid = NULL;
   protected $data = NULL;
 
-  public function __construct(){
+  public function __construct($dbid = null){
     //https://wiki.cam.ac.uk/raven/Accessing_authentication_information
-    $this->crsid = $_SERVER['REMOTE_USER'];    
+    if($dbid === null){ //Get logged in user
+      $this->crsid = $_SERVER['REMOTE_USER'];    
+    }else{ //Get user by DB query
+      $queryString = 
+        "SELECT `crsid`
+         FROM `ballot_individuals` 
+         WHERE `id`='".Database::getInstance()->escape($dbid)."'";
+      $result = Database::getInstance()->query($queryString);
+
+      if($result->num_rows > 0){ //User exists in DB
+        $this->crsid = $result->fetch_assoc()['crsid'];
+      }else{
+        throw new Exception("Can't find user in DB");
+      }
+    }
 
     if($this->crsid == null){
-      throw new Exception("No logged in user");
+      throw new Exception("No such user in existence");
     }
 
     //Get user data from DB (e.g group ID)
@@ -26,6 +40,7 @@ class User {
        WHERE `crsid`='$this->crsid'";
 
     $result = Database::getInstance()->query($queryString);
+
     if($result->num_rows > 0){ //User exists in DB
       $this->data = $result->fetch_assoc();
     }else{ //Create user in DB with individual group
@@ -88,6 +103,10 @@ class User {
     return intval($this->data['id']);
   }
 
+  public function getEmail(){
+    return $this->getCRSID()."@cam.ac.uk";
+  }
+
   public function getRequestingGroupId(){
     if($this->data['requesting'] != ""){
       return intval($this->data['requesting']);
@@ -105,7 +124,7 @@ class User {
     $queries = [];
     
     $queries[] = "UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='$gid'";
-    $queries[] = "UPDATE `ballot_individuals` SET `groupid`='$gid' WHERE `id`='".$this->data['id']."'";
+    $queries[] = "UPDATE `ballot_individuals` SET `groupid`='$gid',`requesting`=NULL WHERE `id`='".$this->data['id']."'";
 
     if(count($oldGroup) > 0){
       if(intval($oldGroup[0]['size']) == 1){

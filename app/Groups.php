@@ -19,7 +19,7 @@ class Groups {
           }
 
           if($user->getRequestingGroupId()){ ?>
-            <a href='?view=<?= $user->getRequestingGroupId(); ?>'>You are currently requesting access to this group</a><br />
+            <a href='?view=<?= $user->getRequestingGroupId(); ?>'>You are currently requesting access to a group</a><br />
 <?
           }
 ?>
@@ -50,7 +50,8 @@ class Groups {
         if($first){ ?>
           <h2><?= htmlentities($row['groupname']); ?></h2> 
 <?
-          if($user->getGroupId() != intval($row['groupid'])){
+          //Only show request link if not currently in the group, or requesting access
+          if($user->getGroupId() != intval($row['groupid']) && $user->getRequestingGroupId() != intval($row['groupid'])){
 ?>
             <a href='/groups?join&id=<?= $row['groupid'] ?>'>Request to Join</a>
 <?

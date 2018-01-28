@@ -61,16 +61,36 @@ class Content {
         //Load in user
         $user = new User();
 
-
         if(isset($_GET['join'])){
-          if(isset($_GET['id'])){
+          if(isset($_GET['id'])){?>
+            <div class='container'>
+<?
+
             //Do join request operation
+            $success = Database::getInstance()->update("ballot_individuals", "`id`='".$user->getId()."'", [
+              "requesting"=>intval($_GET['id'])
+            ]);
+            $gpinfo = Database::getInstance()->fetch("ballot_groups", "`id`='$_GET[id]'");
+            $owner = new User($gpinfo[0]['owner']);
+            mail(
+              $owner->getEmail(), 
+              $user->getCRSID()." has requested to join your ballot group ".$owner->getGroupName(),
+              "Click <a href='?accept=".$user->getId()."&group=".$owner->getGroupId()."'>here to accept this request</a>"
+            );
+
+            if($success){ ?>
+              <b>You have succesfully requested to join <a href='?view=<?= $_GET['id']; ?>'><?= $gpinfo[0]['name']; ?></a></b>
+<?
+            }else{ ?>
+              <b>There was a problem requesting access to this group</b>
+<?
+            }
           }
         }else if(isset($_GET['leave'])){ ?>
           <div class='container'>
 <?
           //Create individual group
-          $groupId = random_int(1, PHP_INT_MAX);
+          $groupId = random_int(0, PHP_INT_MAX);
           $result = Database::getInstance()->insert("ballot_groups", [
             "id" => $groupId,
             "name" => $user->getCRSID(),
@@ -125,7 +145,7 @@ class Content {
         }else{ //Show public groups
           Groups::HTMLtop($user);
 
-          $queryString = "SELECT * FROM `ballot_groups` WHERE `public`=TRUE AND `id`!='".$user->getGroupID()."' AND `size`< ".Groups::maxGroupSize();
+          $queryString = "SELECT * FROM `ballot_groups` WHERE `public`=TRUE AND `id`!='".$user->getGroupID()."' AND `id`!='".$user->getRequestingGroupId()."' AND `size`< ".Groups::maxGroupSize();
           $result = Database::getInstance()->query($queryString);
           Groups::HTMLgroupList($result);
         }
