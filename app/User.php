@@ -19,7 +19,7 @@ class User {
 
     //Get user data from DB (e.g group ID)
     $queryString = 
-      "SELECT `ballot_individuals`.`id` as `id`,`searching`,`groupid`,`name` as `groupname` 
+      "SELECT `ballot_individuals`.`id` as `id`,`searching`,`groupid`,`name` as `groupname`, `individual`
        FROM `ballot_individuals` 
        JOIN `ballot_groups` 
        ON `groupid` = `ballot_groups`.`id`
@@ -81,6 +81,9 @@ class User {
     return intval($this->data['groupid']);
   }
 
+  public function isIndividual(){
+    return $this->data['individual'] === "1";
+  }
   public function getId(){
     return intval($this->data['id']);
   }
@@ -106,7 +109,6 @@ class User {
       }
     }
 
-    
     return $db->transaction($queries);
   }
 }

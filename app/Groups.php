@@ -6,8 +6,18 @@ class Groups {
       <div class="container">
         <h2>Welcome, <?= $user->getCRSID(); ?></h2>
         <p>
-          You are currently part of the group <a href='?view=<?= $user->getGroupId(); ?>'>"<?= $user->getGroupName(); ?>"</a><br />
-          <a href='?leave'>Leave this Group</a><br />
+<?
+          if(!$user->isIndividual()){
+?>
+            You are currently part of the group <a href='?view=<?= $user->getGroupId(); ?>'>"<?= $user->getGroupName(); ?>"</a><br />
+            <a href='?leave'>Leave this Group</a><br />
+<?
+          }else{
+?>
+            You are currently balloting alone.<br />
+<?
+          }
+?>
           <a href='?create'>Create a new Group</a>
         </p>
 <?php

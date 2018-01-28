@@ -66,8 +66,28 @@ class Content {
           if(isset($_GET['id'])){
             //Do join request operation
           }
-        }else if(isset($_GET['leave'])){
+        }else if(isset($_GET['leave'])){ ?>
+          <div class='container'>
+<?
+          //Create individual group
+          $groupId = random_int(1, PHP_INT_MAX);
+          $result = Database::getInstance()->insert("ballot_groups", [
+            "id" => $groupId,
+            "name" => $user->getCRSID(),
+            "owner" => $user->getID(),
+            "public" => false,
+            "individual" => true,
+            "size" => 0
+          ]);
 
+          //Move user to this group
+          if($result && $user->moveToGroup($groupId)){ ?>
+            <b>You're now balloting alone. <a href='/groups'>Go back to Groups page</a></b>
+<?
+          }else{ ?>
+            <b>There was a problem leaving the group, please try again</b>
+<?
+          }
         }else if(isset($_GET['create'])){
           if(isset($_POST['groupname'])){ ?>
             <div class='container'>
