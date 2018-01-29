@@ -149,16 +149,25 @@ class User {
           }
       }
     }
+    
 
-    return $db->transaction($queries);
+    if($db->transaction($queries)){
+      //Update internal state
+      $this->data['requesting'] = "";
+      $this->data['groupid'] = $gid;
+
+      return true;
+    }else{
+      return false;
+    }
   }
 
   public function sendEmail($subject, $body){
     mail(
       $this->getEmail(), 
-      $subject,
+      "=?UTF-8?B?" . base64_encode($subject) . "?=",
       $body,
-      "MIME-Version: 1.0\r\nContent-type: text/html; charset=utf-8\r\n"
+      "MIME-Version: 1.0\r\nContent-type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit;"
     );
   }
 
