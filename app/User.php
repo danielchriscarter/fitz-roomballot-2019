@@ -33,7 +33,7 @@ class User {
 
     //Get user data from DB (e.g group ID)
     $queryString = 
-      "SELECT `ballot_individuals`.`id` as `id`,`searching`,`groupid`,`name` as `groupname`, `individual`, `requesting`
+      "SELECT `ballot_individuals`.`id` as `id`,`searching`,`groupid`,`name` as `groupname`, `individual`, `requesting`, `size`
        FROM `ballot_individuals` 
        JOIN `ballot_groups` 
        ON `groupid` = `ballot_groups`.`id`
@@ -53,6 +53,7 @@ class User {
       $this->data['groupname'] = $this->crsid;
       $this->data['individual'] = true;
       $this->data['requesting'] = null;
+      $this->data['size'] = 1;
 
       $insertSuccess = $db->insert("ballot_individuals", [
         "id"=>$this->getID(),
@@ -86,6 +87,13 @@ class User {
     }
   }
 
+  public function getRequestingGroup(){
+    if($this->getRequestingGroupId() != null){
+      return Database::getInstance()->fetch("ballot_groups", "`id`='".$this->getRequestingGroupId()."'")[0];
+    }
+    return null;
+  }
+
   public function getCRSID(){
     return $this->crsid;
   }
@@ -107,6 +115,10 @@ class User {
 
   public function getEmail(){
     return $this->getCRSID()."@cam.ac.uk";
+  }
+  
+  public function getGroupSize(){
+    return intval($this->data['size']);
   }
 
   public function getRequestingGroupId(){

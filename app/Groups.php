@@ -94,8 +94,7 @@ class Groups {
 <?
     }
 
-
-    public static function HTMLgroupList($result){
+    public static function HTMLgroupList($result, $user = null){
         if($result->num_rows > 0){ ?>
           <h2>Public Groups</h2>
           <table class="table table-condensed table-bordered table-hover" >
@@ -107,6 +106,26 @@ class Groups {
               </tr>
             </thead>
 <?
+            if($user != null){
+              if(!$user->isIndividual()){ ?>
+                <tr class='current-group'>
+                  <td><a href='/groups?view<?= $user->getGroupId(); ?>'><?= $user->getEscapedGroupName(); ?></a></td>
+                  <td><?= $user->getGroupSize(); ?></td>
+                  <td><a href='?leave'>Leave this group</a></td>
+                </tr>
+<?
+              }
+
+              if($user->getRequestingGroupId() != null){ 
+                $groupData = $user->getRequestingGroup(); ?>
+                <tr class='current-request'>
+                  <td><a href='/groups?view=<?= $groupData['id'] ?>'><?= htmlentities($groupData['name']); ?></a></td>
+                  <td><?= $groupData['size']; ?></td>
+                  <td><a href='?cancel'>Cancel join request</a></td>
+                </tr>
+<?
+              }
+            }
             while ($row = $result->fetch_assoc()) {
 ?>
               <tr>

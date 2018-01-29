@@ -175,7 +175,7 @@ class Content {
 
           $queryString = "SELECT * FROM `ballot_groups` WHERE `public`=TRUE AND `id`!='".$user->getGroupID()."' AND `id`!='".$user->getRequestingGroupId()."' AND `size`< ".Groups::maxGroupSize();
           $result = Database::getInstance()->query($queryString);
-          Groups::HTMLgroupList($result);
+          Groups::HTMLgroupList($result, $user);
         }
 
         Groups::HTMLbottom();
