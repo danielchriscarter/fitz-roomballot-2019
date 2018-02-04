@@ -62,27 +62,38 @@ class Content {
         //Load in user
         $user = new User();
 
+        if(count($_GET) > 1){ //At least one request ?>
+          <div class='container'><a href='/groups'>⇦ Group Ballot Home</a></div>   
+<?      }
+
         if(isset($_GET['join'])){
           if(isset($_GET['id'])){?>
             <div class='container'>
 <?
 
-            //Do join request operation
-            $success = Database::getInstance()->update("ballot_individuals", "`id`='".$user->getId()."'", [
-              "requesting"=>intval($_GET['id'])
-            ]);
             $group = new Group($_GET['id']);
             $owner = new User($group->getOwnerID());
-            $owner->sendEmail(
-              $user->getCRSID()." has requested to join your ballot group '".$group->getUnsafeName()."'",
-              "<a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroup()->getID()."'>Click here to accept this request</a>"
-            );
-            if($success){ ?>
-              <b>You have succesfully requested to join <?= $group->getHTMLLink(); ?></a></b>
-<?
-            }else{ ?>
-              <b>There was a problem requesting access to this group</b>
-<?
+
+            if($user->getGroup() == $group){ 
+              echo "<b>You can't request access to your own group!</b>";
+            }else{
+              //Do join request operation
+              $success = Database::getInstance()->update("ballot_individuals", "`id`='".$user->getId()."'", [
+                "requesting"=>$group->getID()
+              ]);
+
+              $owner->sendEmail(
+                $user->getCRSID()." has requested to join your ballot group '".$group->getUnsafeName()."'",
+                "<a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroup()->getID()."'>Click here to accept this request</a>"
+              );
+              if($success){ ?>
+                <b>You have succesfully requested to join <?= $group->getHTMLLink(); ?></a></b>
+<?              if($user->ownsGroup($user->getGroup()) || (!$user->isIndividual() && $user->getGroup()->getSize() != 1)){ ?>
+                  <br /><b>You will not be able to join the new group while you own your current one.</b>
+<?              }
+              }else{ ?>
+                <b>There was a problem requesting access to this group</b>
+<?            }
             }
           }
         }else if(isset($_GET['cancel'])){ ?>
@@ -193,30 +204,35 @@ class Content {
               }
             }
           }
-        }else if(isset($_GET['assign'])){ ?>
-          <div class='container'>    
-<?
-          //Do some checks
-          $group = new Group($_GET['group']);
-          $newOwner = new User($_GET['assign']);
-          
-          if(!$user->ownsGroup($group)){
-            echo "<b>You don't own this group and so cannot assign owners</b>";
-          }else if($newOwner->getGroup() != $group){
-            echo "<b>".$newOwner->getCRSID()." is not a member of this group and so cannot become owner</b>";
-          }else{
-            //Set group owner to newOwner's ID
-            $result = Database::getInstance()->update("ballot_groups", "`id`='".$group->getID()."' AND `owner`='".$user->getID()."'", ["owner"=>$newOwner->getID()]);
-            if($result){ 
-              echo "<b>You are no longer owner of ".$group->getName()."</b>"; 
-              $newOwner->sendEmail( 
-                $user->getCRSID()." has given you ownership of '".$group->getUnsafeName()."'", 
-                $group->getHTMLLink("Click here to view the group")
-              );
+        }else if(isset($_GET['assign'])){ 
+          if(isset($_GET['confirm'])){ ?>
+            <div class='container'>    
+<?          //Do some checks
+            $group = new Group($_GET['group']);
+            $newOwner = new User($_GET['assign']);
+            
+            if(!$user->ownsGroup($group)){
+              echo "<b>You don't own this group and so cannot assign owners</b>";
+            }else if($newOwner->getGroup() != $group){
+              echo "<b>".$newOwner->getCRSID()." is not a member of this group and so cannot become owner</b>";
             }else{
-              echo "<b>There was an error removing you as owner</b>";
+              //Set group owner to newOwner's ID
+              $result = Database::getInstance()->update("ballot_groups", "`id`='".$group->getID()."' AND `owner`='".$user->getID()."'", ["owner"=>$newOwner->getID()]);
+              if($result){ 
+                echo "<b>You are no longer owner of ".$group->getName()."</b>"; 
+                $newOwner->sendEmail( 
+                  $user->getCRSID()." has given you ownership of '".$group->getUnsafeName()."'", 
+                  $group->getHTMLLink("Click here to view the group")
+                );
+              }else{
+                echo "<b>There was an error removing you as owner</b>";
+              }
             }
-          }
+          }else{ 
+            Groups::HTMLtop($user); ?>
+            <b>If you click confirm, you will no longer be owner of this group.</b><br />
+            <a href='/groups?assign=<?= $_GET['assign']; ?>&group=<?= $_GET['group']; ?>&confirm'>Confirm.</a>
+<?        }
         }else{ //Show public groups
           Groups::HTMLtop($user);
 

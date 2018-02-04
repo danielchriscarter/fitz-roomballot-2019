@@ -135,7 +135,7 @@ class User {
     //If group will be empty, remove it
 
     if($this->getGroup()->getSize() != 1 && !$this->isIndividual() && $this->ownsGroup($this->getGroup())){
-      echo "Group owner ".$this->getCRSID()." can't leave group<br />";
+      echo "Group owner ".$this->getCRSID()." can't leave their current group.<br />";
       return false;
     }
 

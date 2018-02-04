@@ -9,7 +9,7 @@ class Groups {
             $owner = $user->ownsGroup($user->getGroup()); ?>
             You are currently <?= $owner ? "owner" : "part" ?> of the group "<?= $user->getGroup()->getHTMLLink(); ?>"<br />
 
-<?          if(!$owner){ ?>
+<?          if(!$owner || $user->getGroup()->getSize() == 1){ ?>
               <a href='?leave'>Leave this Group</a><br />
 <?          }
           }else{ ?>
@@ -19,8 +19,10 @@ class Groups {
 
           if($user->getRequestingGroup()){ ?>
             You are currently requesting access to the group "<?= $user->getRequestingGroup()->getHTMLLink(); ?>"<br />
+<?        } 
+          if(!isset($_GET['create'])){ ?>
+            <a href='?create'>Create a new Group</a>
 <?        } ?>
-          <a href='?create'>Create a new Group</a>
         </p>
 <?  }
 
@@ -52,6 +54,7 @@ class Groups {
 <?      }else if($owner){ 
           $public = $group->isPublic(); ?>
           You are owner of this group.<br />
+          <b><a href='?join&id=<?= $group->getID(); ?>'>Share this link with others so they can join your group!</a></b><br />
           <a href='?change=<?= $group->getID(); ?>&public=<?= $public ? "0":"1" ?>'>Make group <?= $public ? "private" : "public" ?>.</a>
 <?      } ?>
 
@@ -108,8 +111,8 @@ class Groups {
     public static function HTMLcreate(){ ?>
       <h2>Create a New Group</h2>
       <form action="" method="POST">
-        <input name="groupname" type="text" placeholder="Group Name" /><br />
-        <label for="public">Make this group visible publically?</label> <input name="public" type="checkbox" value="false" /><br />
+        <input name="groupname" maxlength="100" type="text" placeholder="Group Name" /><br />
+        <label for="public">Make this group visible publicly?</label> <input name="public" type="checkbox" value="false" /><br />
         <input type="submit" value="Create Group" />
       </form>
 <?
