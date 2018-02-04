@@ -52,7 +52,7 @@ class Groups {
 <?      }else if($owner){ 
           $public = $group->isPublic(); ?>
           You are owner of this group.<br />
-          <a href='?change&privacy=<?= $public ? "0":"1" ?>'>Make group <?= $public ? "private" : "public" ?></a>
+          <a href='?change=<?= $group->getID(); ?>&public=<?= $public ? "0":"1" ?>'>Make group <?= $public ? "private" : "public" ?>.</a>
 <?      } ?>
 
         <h3>Members</h3>
@@ -79,7 +79,25 @@ class Groups {
 <?        } ?>
         </table>
 
-<?      
+<?      if($owner){
+          $requesting = $group->getRequestingList();
+          if(count($requesting) != 0){ ?>
+            <h3>Pending Join Requests</h3>
+            <table class="table table-condensed table-bordered table-hover">
+              <thead>
+                <tr>
+                  <td>CRSid</td>
+                  <td>Accept Request</td>
+                </tr>
+              </thead>
+<?          foreach($requesting as $member){ ?>
+              <tr>
+                <td><?= $member['crsid']; ?></td>
+                <td><a href='?accept=<?= $member['id']; ?>&group=<?= $group->getID(); ?>'>Accept Request</a></td>
+              </tr>
+<?          }
+          }
+        }
       }
     }
     public static function HTMLjoin(){ ?>

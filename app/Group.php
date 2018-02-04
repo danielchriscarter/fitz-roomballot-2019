@@ -71,6 +71,14 @@ class Group {
     return $this->data['public'] == "1";
   }
 
+  public function setPublic(bool $public){
+    $result = Database::getInstance()->update("ballot_groups", "`id`='".$this->getID()."'", [
+      "public" => $public 
+    ]);
+
+    return $result;
+  }
+
   public function getOwnerID(){
     return intval($this->data['owner']);
   }
@@ -97,13 +105,25 @@ class Group {
               JOIN `ballot_individuals`
               ON `groupid`=`ballot_groups`.`id` 
               WHERE `ballot_groups`.`id`='".$this->getID()."'";
-
     $result = Database::getInstance()->query($query);
     $rows = [];
     while($row = $result->fetch_assoc()){
       $rows[] = $row;
-    }
+    } 
+    return $rows;
+  }
 
+  public function getRequestingList(){
+    $query = "SELECT `ballot_individuals`.`id` as `id`, `crsid`
+              FROM `ballot_groups`
+              JOIN `ballot_individuals`
+              ON `requesting`=`ballot_groups`.`id` 
+              WHERE `ballot_groups`.`id`='".$this->getID()."'"; 
+    $result = Database::getInstance()->query($query);
+    $rows = []; 
+    while($row = $result->fetch_assoc()){
+      $rows[] = $row;
+    } 
     return $rows;
   }
 }

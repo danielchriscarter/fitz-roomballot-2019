@@ -181,6 +181,18 @@ class Content {
             echo "<b>".$e->getMessage()."</b>";
           }
 
+        }else if(isset($_GET['change'])){ ?>
+          <div class='container'>    
+<?        $group = new Group($_GET['change']);
+          if($user->ownsGroup($group)){
+            if(isset($_GET['public'])){
+              if($group->setPublic($_GET['public'] == "1")){
+                echo "<b>You have succesfully changed group publicity options. ".$group->getHTMLLink("Go back to group")."<br />";
+              }else{
+                echo "<b>There was a problem changing publicity</b>";
+              }
+            }
+          }
         }else if(isset($_GET['assign'])){ ?>
           <div class='container'>    
 <?
