@@ -29,7 +29,7 @@ class Group {
       "name" => $individual ? $owner->getCRSID() : $name,
       "owner" => $owner->getID(),
       "public" => false,
-      "individual" => true,
+      "individual" => $individual,
       "size" => 0
     ]);
 
@@ -37,6 +37,13 @@ class Group {
       return new Group($groupId);
     }else{
       throw new Exception("Error creating group");
+    }
+  }
+
+  public static function deleteGroup($group){
+    $success = Database::getInstance()->delete("ballot_groups", "`id`='".$group->getID()."'");
+    if(!$success){
+      throw new Exception("Error deleting group");
     }
   }
 
@@ -59,6 +66,10 @@ class Group {
   public function isIndividual(){
     return $this->data['individual'] == "1";
   }
+  
+  public function isPublic(){
+    return $this->data['public'] == "1";
+  }
 
   public function getOwnerID(){
     return intval($this->data['owner']);
@@ -69,7 +80,7 @@ class Group {
   }
   
   public function getURL(){
-    return "?view=".$this->getID();
+    return "https://roomballot.fitzjcr.com/groups?view=".$this->getID();
   }
 
   public function getHTMLLink($string = null){

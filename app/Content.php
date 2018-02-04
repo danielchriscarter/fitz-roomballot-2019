@@ -74,7 +74,7 @@ class Content {
             $group = new Group($_GET['id']);
             $owner = new User($group->getOwnerID());
             $owner->sendEmail(
-              $user->getCRSID()." has requested to join your ballot group '".$group->getName()."'",
+              $user->getCRSID()." has requested to join your ballot group '".$group->getUnsafeName()."'",
               "<a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroup()->getID()."'>Click here to accept this request</a>"
             );
             if($success){ ?>
@@ -119,7 +119,7 @@ class Content {
             //Move user to group
             if($toAccept->moveToGroup($group)){ 
               $toAccept->sendEmail(
-                "You've been accepted into the ballot group '".$user->getEscapedGroupName()."'",
+                "You've been accepted into the ballot group '".$group->getUnsafeName()."'",
                 $group->getHTMLLink("Click here to view the group")
               );
             ?>
@@ -146,7 +146,7 @@ class Content {
               <b>You're now balloting alone. <a href='/groups'>Go back to Groups page</a></b>
 <?
             }else{ 
-              echo Database::getInstance()->error(); ?>
+              Group::deleteGroup($newGroup); ?>
               <b>There was a problem leaving the group, please try again</b>
 <?
             }
@@ -161,9 +161,10 @@ class Content {
             //Do create operation
             $group = Group::createGroup($_POST['groupname'], $user);
             //Place user in group
-            if($user->moveToGroup($newGroupId)){
+            if($user->moveToGroup($group)){
               echo "<b>Group Created! ".$group->getHTMLLink("Go to group")."</b>";
             }else{
+              Group::deleteGroup($group);
               echo "<b>There was a problem creating the group.</b>";
             }
           }else{
@@ -194,10 +195,10 @@ class Content {
           }else{
             //Set group owner to newOwner's ID
             $result = Database::getInstance()->update("ballot_groups", "`id`='".$group->getID()."' AND `owner`='".$user->getID()."'", ["owner"=>$newOwner->getID()]);
-            if($result){
-              echo "<b>You are no longer owner of ".$group->getName()."</b>";
-              $newOwner->sendEmail(
-                $user->getCRSID()." has given you ownership of '".$user->getGroupName()."'",
+            if($result){ 
+              echo "<b>You are no longer owner of ".$group->getName()."</b>"; 
+              $newOwner->sendEmail( 
+                $user->getCRSID()." has given you ownership of '".$group->getUnsafeName()."'", 
                 $group->getHTMLLink("Click here to view the group")
               );
             }else{

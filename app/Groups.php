@@ -1,36 +1,28 @@
 <?php
 class Groups {
 
-    public static function HTMLtop($user) {
-?>
+    public static function HTMLtop($user) { ?>
       <div class="container">
         <h2>Welcome, <?= $user->getCRSID(); ?></h2>
         <p>
-<?
-          if(!$user->isIndividual()){
-            $owner = $user->ownsGroup($user->getGroup());
-?>
+<?        if(!$user->isIndividual()){
+            $owner = $user->ownsGroup($user->getGroup()); ?>
             You are currently <?= $owner ? "owner" : "part" ?> of the group "<?= $user->getGroup()->getHTMLLink(); ?>"<br />
-<?
-            if(!$owner){
-?>
+
+<?          if(!$owner){ ?>
               <a href='?leave'>Leave this Group</a><br />
-<?
-            }
-          }else{
-?>
+<?          }
+          }else{ ?>
             You are currently balloting alone.<br />
 <?
           }
 
-          if($user->getRequestingGroup()){
-            echo $user->getRequestingGroup()->getHTMLLink("You are currently requesting access to a group")."<br />";
-          }
-?>
+          if($user->getRequestingGroup()){ ?>
+            You are currently requesting access to the group "<?= $user->getRequestingGroup()->getHTMLLink(); ?>"<br />
+<?        } ?>
           <a href='?create'>Create a new Group</a>
         </p>
-<?php
-    }
+<?  }
 
     public static function maxGroupSize(){
       return 9;
@@ -56,9 +48,11 @@ class Groups {
 
 <?      //Only show request link if not currently in the group, or requesting access
         if($user->getGroup() != $group && $user->getRequestingGroup() != $group){ ?>
-          <a href='/groups?join&id=<?= $row['groupid'] ?>'>Request to Join</a>
-<?      }else if($owner){ ?>
-          You are owner of this group.
+          <a href='/groups?join&id=<?= $group->getID(); ?>'>Request to Join</a>
+<?      }else if($owner){ 
+          $public = $group->isPublic(); ?>
+          You are owner of this group.<br />
+          <a href='?change&privacy=<?= $public ? "0":"1" ?>'>Make group <?= $public ? "private" : "public" ?></a>
 <?      } ?>
 
         <h3>Members</h3>
@@ -84,7 +78,9 @@ class Groups {
             </tr>
 <?        } ?>
         </table>
-<?    }
+
+<?      
+      }
     }
     public static function HTMLjoin(){ ?>
 
@@ -102,7 +98,7 @@ class Groups {
     }
 
     public static function HTMLgroupList($result, $user = null){
-        if($result->num_rows > 0){ ?>
+        if($result->num_rows > 0 || ($user != null && ($user->isIndividual() || $user->getRequestingGroup() != null))){ ?>
           <h2>Public Groups</h2>
           <table class="table table-condensed table-bordered table-hover" >
             <thead>

@@ -79,7 +79,7 @@ class User {
     }
 
     if($this->data['requesting'] != null){
-      $this->requestingGroup = new Group($this->data['groupid']);
+      $this->requestingGroup = new Group($this->data['requesting']);
     }
   }
 
@@ -134,7 +134,7 @@ class User {
     //Decrement current group size, increment new group size, update group ID field
     //If group will be empty, remove it
 
-    if($this->getGroup()->getSize() != 1 && !$this->isIndividual() && $this->ownsGroup($group)){
+    if($this->getGroup()->getSize() != 1 && !$this->isIndividual() && $this->ownsGroup($this->getGroup())){
       echo "Group owner ".$this->getCRSID()." can't leave group<br />";
       return false;
     }
@@ -143,8 +143,8 @@ class User {
     
     $queries = [];
     
-    $queries[] = "UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='$gid'";
-    $queries[] = "UPDATE `ballot_individuals` SET `groupid`='$gid',`requesting`=NULL WHERE `id`='".$this->data['id']."'";
+    $queries[] = "UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='".$group->getID()."'";
+    $queries[] = "UPDATE `ballot_individuals` SET `groupid`='".$group->getID()."',`requesting`=NULL WHERE `id`='".$this->getID()."'";
 
     if($this->data['groupid'] != null){
       $oldGroup = $db->fetch("ballot_groups", "`id`='".$this->data['groupid']."'");
