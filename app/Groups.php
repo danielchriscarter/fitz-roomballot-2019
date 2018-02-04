@@ -119,8 +119,8 @@ class Groups {
     }
 
     public static function HTMLgroupList($result, $user = null){
-        if($result->num_rows > 0 || ($user != null && ($user->isIndividual() || $user->getRequestingGroup() != null))){ ?>
-          <h2>Public Groups</h2>
+        if($result->num_rows > 0 || ($user != null && (!$user->isIndividual() || $user->getRequestingGroup() != null))){ ?>
+          <h2>Groups Visible to You</h2>
           <table class="table table-condensed table-bordered table-hover" >
             <thead>
               <tr>

@@ -76,6 +76,8 @@ class Content {
 
             if($user->getGroup() == $group){ 
               echo "<b>You can't request access to your own group!</b>";
+            }else if($user->getRequestingGroup() == $group){
+              echo "<b>You are already requesting access to this group.</b>";
             }else{
               //Do join request operation
               $success = Database::getInstance()->update("ballot_individuals", "`id`='".$user->getId()."'", [
@@ -88,7 +90,7 @@ class Content {
               );
               if($success){ ?>
                 <b>You have succesfully requested to join <?= $group->getHTMLLink(); ?></a></b>
-<?              if($user->ownsGroup($user->getGroup()) || (!$user->isIndividual() && $user->getGroup()->getSize() != 1)){ ?>
+<?              if($user->ownsGroup($user->getGroup()) && !$user->isIndividual() && $user->getGroup()->getSize() != 1){ ?>
                   <br /><b>You will not be able to join the new group while you own your current one.</b>
 <?              }
               }else{ ?>
@@ -148,7 +150,7 @@ class Content {
           <div class='container'>
 <?
           //User can only leave groups they're not a part of
-          if(!$user->ownsGroup($user->getGroup())){
+          if(!$user->ownsGroup($user->getGroup()) || $user->isIndividual() || $user->getGroup()->getSize() == 1){
             //Create individual group
             $newGroup = Group::createGroup($user->getCRSID(), $user, true);
 
