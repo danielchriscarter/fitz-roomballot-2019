@@ -129,9 +129,28 @@ class User {
     }
   }
 
+  public function ownsGroup($gid){
+    //Check if user owns group
+    $db = Database::getInstance();
+
+    $result = $db->query(
+      "SELECT * FROM `ballot_groups`
+       JOIN `ballot_individuals` ON `owner`=`ballot_individuals`.`id`
+       WHERE `crsid`='".$this->getCRSID()."'
+       AND `ballot_groups`.`id`='".intval($gid)."';");
+
+     return ($result->num_rows > 0);
+  }
+
   public function moveToGroup($gid){
     //Decrement current group size, increment new group size, update group ID field
     //If group will be empty, remove it
+
+    if(!$this->getGroupSize() == 1 && !$this->isIndividual() && $this->ownsGroup($this->data['groupid'])){
+      echo "Group owner ".$this->getCRSID()." can't leave group<br />";
+      return false;
+    }
+
     $db = Database::getInstance();
     
     $queries = [];
