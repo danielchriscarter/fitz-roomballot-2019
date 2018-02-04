@@ -8,9 +8,9 @@ class Groups {
         <p>
 <?
           if(!$user->isIndividual()){
-            $owner = $user->ownsGroup($user->getGroupId());
+            $owner = $user->ownsGroup($user->getGroup());
 ?>
-            You are currently <?= $owner ? "owner" : "part" ?> of the group <a href='?view=<?= $user->getGroupId(); ?>'>"<?= $user->getEscapedGroupName(); ?>"</a><br />
+            You are currently <?= $owner ? "owner" : "part" ?> of the group "<?= $user->getGroup()->getHTMLLink(); ?>"<br />
 <?
             if(!$owner){
 ?>
@@ -23,9 +23,8 @@ class Groups {
 <?
           }
 
-          if($user->getRequestingGroupId()){ ?>
-            <a href='?view=<?= $user->getRequestingGroupId(); ?>'>You are currently requesting access to a group</a><br />
-<?
+          if($user->getRequestingGroup()){
+            echo $user->getRequestingGroup()->getHTMLLink("You are currently requesting access to a group")."<br />";
           }
 ?>
           <a href='?create'>Create a new Group</a>
@@ -45,66 +44,47 @@ class Groups {
       }
     }
 
-    public static function HTMLgroupView($user, $result){
-      if($result->num_rows == 0){ ?>
+    public static function HTMLgroupView($user, $group){
+      $members = $group->getMemberList();
+      if(count($members) == 0){ ?>
         <h2>No group found</h2>       
 <?
-      }
-      $first = true;
-      while($row = $result->fetch_assoc()){
-        if($first){ 
-          $owner = $user->ownsGroup($row['groupid']);
-          $first = false; ?>
-          <h2><?= htmlentities($row['groupname']); ?></h2> 
-<?
-          //Only show request link if not currently in the group, or requesting access
-          if($user->getGroupId() != intval($row['groupid']) && $user->getRequestingGroupId() != intval($row['groupid'])){
-?>
-            <a href='/groups?join&id=<?= $row['groupid'] ?>'>Request to Join</a>
-<?
-          }else if($owner){
-?>
-            You are owner of this group.
-<?
-          }
-?>
-          <h3>Members</h3>
-          <table class="table table-condensed table-bordered table-hover">
-            <thead>
-              <tr>
-                <td>CRSid</td>
-<?              if($owner){ ?>
-                  <td>Assign Ownership</td>
-<?              } ?>
-              </tr>
-            </thead>
+      }else{ 
+        $owner = $user->ownsGroup($group); ?>
+
+        <h2><?= $group->getName(); ?></h2> 
+
+<?      //Only show request link if not currently in the group, or requesting access
+        if($user->getGroup() != $group && $user->getRequestingGroup() != $group){ ?>
+          <a href='/groups?join&id=<?= $row['groupid'] ?>'>Request to Join</a>
+<?      }else if($owner){ ?>
+          You are owner of this group.
+<?      } ?>
+
+        <h3>Members</h3>
+        <table class="table table-condensed table-bordered table-hover">
+          <thead>
             <tr>
-              <td><?= $row['crsid']; ?></td>
-<?            if($owner){
-                if($user->getCRSID() == $row['crsid']) {?>
-                  <td></td>
-<?              }else{ ?>
-                  <td><a href='?assign=<?= $row['id']; ?>&group=<?= $row['groupid']; ?>'>Assign Ownership</a></td>
-<?              }
+              <td>CRSid</td>
+<?            if($owner){ ?>
+                <td>Assign Ownership</td>
+<?            } ?>
+            </tr>
+          </thead>
+<?        foreach($members as $member){ ?>
+            <tr>
+              <td><?= $member['crsid']; ?></td>
+<?              if($owner){
+                  if($user->getCRSID() == $member['crsid']) {?>
+                    <td></td>
+<?                }else{ ?>
+                    <td><a href='?assign=<?= $member['id']; ?>&group=<?= $group->getID(); ?>'>Assign Ownership</a></td>
+<?                }
               }?>
             </tr>
-<?
-        }else{ ?>
-          <tr>
-            <td><?= $row['crsid']; ?></td>
-<?            if($owner){
-                if($user->getCRSID() == $row['crsid']) {?>
-                  <td></td>
-<?              }else{ ?>
-                  <td><a href='?assign=<?= $row['id']; ?>&group=<?= $row['groupid']; ?>'>Assign Ownership</a></td>
-<?              }
-              }?>
-          </tr>
-<?
-        }
-      } ?>
-      </table>
-<?
+<?        } ?>
+        </table>
+<?    }
     }
     public static function HTMLjoin(){ ?>
 
@@ -136,42 +116,40 @@ class Groups {
             if($user != null){
               if(!$user->isIndividual()){ ?>
                 <tr class='current-group'>
-                  <td><a href='/groups?view=<?= $user->getGroupId(); ?>'><?= $user->getEscapedGroupName(); ?></a></td>
-                  <td><?= $user->getGroupSize(); ?></td>
-                  <td><a href='?leave'>Leave this group</a></td>
+                  <td><?= $user->getGroup()->getHTMLLink(); ?></td>
+                  <td><?= $user->getGroup()->getSize(); ?></td>
+                  <td>
+<?                  if(!$user->ownsGroup($user->getGroup())){ ?>
+                      <a href='?leave'>Leave this group</a>
+<?                  } ?>
+                  </td>
                 </tr>
-<?
-              }
+<?            }
 
-              if($user->getRequestingGroupId() != null){ 
-                $groupData = $user->getRequestingGroup(); ?>
+              if($user->getRequestingGroup() != null){ ?>
                 <tr class='current-request'>
-                  <td><a href='/groups?view=<?= $groupData['id'] ?>'><?= htmlentities($groupData['name']); ?></a></td>
-                  <td><?= $groupData['size']; ?></td>
+                  <td><?= $user->getRequestingGroup()->getHTMLLink(); ?></td>
+                  <td><?= $user->getRequestingGroup()->getSize(); ?></td>
                   <td><a href='?cancel'>Cancel join request</a></td>
                 </tr>
 <?
               }
             }
-            while ($row = $result->fetch_assoc()) {
-?>
+            while ($row = $result->fetch_assoc()) { ?>
               <tr>
                 <td><a href='/groups?view=<?= $row['id'] ?>'><?= htmlentities($row['name']); ?></a></td>
                 <td><?= $row['size']; ?></td>
                 <td><a href='/groups?join&id=<?= $row['id']; ?>'>Request to Join</a></td>
               </tr>
-<?
-            }
-?>
+<?          } ?>
           </table>
-<?
-        }
+<?      }
     }
 
     public static function HTMLbottom() {
 ?>
       </div>
-<?php
+<?
 	}
 }
 

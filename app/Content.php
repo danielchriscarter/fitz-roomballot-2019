@@ -7,6 +7,7 @@ require_once "lib/Michelf/SmartyPants.php";
 require_once "News.php";
 require_once "Timetable.php";
 require_once "Groups.php";
+require_once "Group.php";
 require_once "User.php";
 
 class Content {
@@ -70,14 +71,14 @@ class Content {
             $success = Database::getInstance()->update("ballot_individuals", "`id`='".$user->getId()."'", [
               "requesting"=>intval($_GET['id'])
             ]);
-            $gpinfo = Database::getInstance()->fetch("ballot_groups", "`id`='$_GET[id]'");
-            $owner = new User($gpinfo[0]['owner']);
+            $group = new Group($_GET['id']);
+            $owner = new User($group->getOwnerID());
             $owner->sendEmail(
-              $user->getCRSID()." has requested to join your ballot group '".$owner->getGroupName()."'",
-              "Click <a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroupId()."'>here to accept this request</a>"
+              $user->getCRSID()." has requested to join your ballot group '".$group->getName()."'",
+              "<a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroup()->getID()."'>Click here to accept this request</a>"
             );
             if($success){ ?>
-              <b>You have succesfully requested to join <a href='?view=<?= $_GET['id']; ?>'><?= htmlentities($gpinfo[0]['name']); ?></a></b>
+              <b>You have succesfully requested to join <?= $group->getHTMLLink(); ?></a></b>
 <?
             }else{ ?>
               <b>There was a problem requesting access to this group</b>
@@ -87,7 +88,7 @@ class Content {
         }else if(isset($_GET['cancel'])){ ?>
           <div class='container'>
 <?
-          //Do join request operation
+          //Do cancel request operation
           $success = Database::getInstance()->update("ballot_individuals", "`id`='".$user->getId()."'", [
             "requesting"=>null
           ]);
@@ -104,25 +105,28 @@ class Content {
           Groups::HTMLtop($user);
 
           $toAccept = new User($_GET['accept']);
-          $groupID = intval($_GET['group']);
+          $group = new Group($_GET['group']);
 
           //Check, within the query, whether all of the requirements are true.
           $dbQuery =
             "SELECT * FROM `ballot_individuals`
              JOIN `ballot_groups` ON `requesting`=`ballot_groups`.`id`
-             WHERE `owner`='".$user->getId()."' AND `requesting`='$groupID' AND `ballot_individuals`.`id`='".$toAccept->getId()."'";
+             WHERE `owner`='".$user->getId()."' AND `requesting`='".$group->getID()."' AND `ballot_individuals`.`id`='".$toAccept->getId()."'";
 
           $result = Database::getInstance()->query($dbQuery);
          
           if($result->num_rows > 0){
             //Move user to group
-            if($toAccept->moveToGroup($groupID)){ 
+            if($toAccept->moveToGroup($group)){ 
               $toAccept->sendEmail(
                 "You've been accepted into the ballot group '".$user->getEscapedGroupName()."'",
-                "Click <a href='https://roomballot.fitzjcr.com/groups?view=".$user->getGroupId()."'>here</a> to go to the group."
+                $group->getHTMLLink("Click here to view the group")
               );
             ?>
               <b>You have accepted <?= $toAccept->getCRSID(); ?> into your group.</b>             
+<?
+            }else{ ?>
+              <b>There was a problem accepting the request - are they owner of a different group?</b>             
 <?
             }
           }else{ ?>
@@ -133,20 +137,12 @@ class Content {
           <div class='container'>
 <?
           //User can only leave groups they're not a part of
-          if(!$user->ownsGroup($user->getGroupId())){
+          if(!$user->ownsGroup($user->getGroup())){
             //Create individual group
-            $groupId = random_int(0, PHP_INT_MAX);
-            $result = Database::getInstance()->insert("ballot_groups", [
-              "id" => $groupId,
-              "name" => $user->getCRSID(),
-              "owner" => $user->getID(),
-              "public" => false,
-              "individual" => true,
-              "size" => 0
-            ]);
+            $newGroup = Group::createGroup($user->getCRSID(), $user, true);
 
             //Move user to this group
-            if($result && $user->moveToGroup($groupId)){ ?>
+            if($user->moveToGroup($newGroup)){ ?>
               <b>You're now balloting alone. <a href='/groups'>Go back to Groups page</a></b>
 <?
             }else{ 
@@ -163,21 +159,10 @@ class Content {
             <div class='container'>
 <?
             //Do create operation
-
-            $newGroupId = random_int(0, PHP_INT_MAX);
-            //Create group
-            $result = Database::getInstance()->insert("ballot_groups", [
-              "id" => $newGroupId,
-              "name" => $_POST['groupname'],
-              "owner" => $user->getID(),
-              "public" => isset($_POST['public']) && $_POST['public'] ? true : false,
-              "individual" => false,
-              "size" => 0
-            ]);
-
+            $group = Group::createGroup($_POST['groupname'], $user);
             //Place user in group
-            if($result && $user->moveToGroup($newGroupId)){
-              echo "<b>Group Created! <a href='?view=$newGroupId'>Go to group</a></b>";
+            if($user->moveToGroup($newGroupId)){
+              echo "<b>Group Created! ".$group->getHTMLLink("Go to group")."</b>";
             }else{
               echo "<b>There was a problem creating the group.</b>";
             }
@@ -188,29 +173,32 @@ class Content {
         }else if(isset($_GET['view'])){ //Show group information
           Groups::HTMLtop($user);
 
-          $queryString = Groups::getGroupQuery($_GET['view']);
-          $result = Database::getInstance()->query($queryString);
+          try{
+            $group = new Group($_GET['view']);
+            Groups::HTMLgroupView($user, $group);
+          }catch(Exception $e){
+            echo "<b>".$e->getMessage()."</b>";
+          }
 
-          Groups::HTMLgroupView($user, $result);
         }else if(isset($_GET['assign'])){ ?>
           <div class='container'>    
 <?
           //Do some checks
-          $groupID = intval($_GET['group']);
+          $group = new Group($_GET['group']);
           $newOwner = new User($_GET['assign']);
           
-          if(!$user->ownsGroup($groupID)){
+          if(!$user->ownsGroup($group)){
             echo "<b>You don't own this group and so cannot assign owners</b>";
-          }else if($newOwner->getGroupId() != $groupID){
+          }else if($newOwner->getGroup() != $group){
             echo "<b>".$newOwner->getCRSID()." is not a member of this group and so cannot become owner</b>";
           }else{
             //Set group owner to newOwner's ID
-            $result = Database::getInstance()->update("ballot_groups", "`id`='$groupID' AND `owner`='".$user->getID()."'", ["owner"=>$newOwner->getID()]);
+            $result = Database::getInstance()->update("ballot_groups", "`id`='".$group->getID()."' AND `owner`='".$user->getID()."'", ["owner"=>$newOwner->getID()]);
             if($result){
-              echo "<b>You are no longer owner of ".$user->getEscapedGroupName()."</b>";
+              echo "<b>You are no longer owner of ".$group->getName()."</b>";
               $newOwner->sendEmail(
                 $user->getCRSID()." has given you ownership of '".$user->getGroupName()."'",
-                "Click <a href='https://roomballot.fitzjcr.com/groups?view=".$user->getGroupId()."'>here to view the group</a>"
+                $group->getHTMLLink("Click here to view the group")
               );
             }else{
               echo "<b>There was an error removing you as owner</b>";

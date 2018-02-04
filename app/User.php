@@ -4,10 +4,14 @@
  */
 
 require_once "Database.php";
+require_once "Group.php";
 
 class User {
   protected $crsid = NULL;
   protected $data = NULL;
+
+  protected $group = null;
+  protected $requestingGroup = null;
 
   public function __construct($dbid = null){
     //https://wiki.cam.ac.uk/raven/Accessing_authentication_information
@@ -33,10 +37,8 @@ class User {
 
     //Get user data from DB (e.g group ID)
     $queryString = 
-      "SELECT `ballot_individuals`.`id` as `id`,`searching`,`groupid`,`name` as `groupname`, `individual`, `requesting`, `size`
+      "SELECT *
        FROM `ballot_individuals` 
-       JOIN `ballot_groups` 
-       ON `groupid` = `ballot_groups`.`id`
        WHERE `crsid`='$this->crsid'";
 
     $result = Database::getInstance()->query($queryString);
@@ -50,10 +52,7 @@ class User {
       $this->data['id'] = random_int(0, PHP_INT_MAX);
       $this->data['searching'] = false;
       $this->data['groupid'] = null;
-      $this->data['groupname'] = $this->crsid;
-      $this->data['individual'] = true;
       $this->data['requesting'] = null;
-      $this->data['size'] = 1;
 
       $insertSuccess = $db->insert("ballot_individuals", [
         "id"=>$this->getID(),
@@ -67,48 +66,36 @@ class User {
       }
 
       //Create a new individual group for this user
-      $groupId = random_int(0, PHP_INT_MAX);
-      $result = Database::getInstance()->insert("ballot_groups", [
-        "id" => $groupId,
-        "name" => $this->crsid,
-        "owner" => $this->getID(),
-        "public" => false,
-        "individual" => true,
-        "size" => 0
-      ]);
+      $newGroup = Group::createGroup($this->crsid, $this, true);
 
-      if(!$result){
-        throw new Exception("Error creating group for new user");
-      }
-
-      if(!$this->moveToGroup($groupId)){
+      if(!$this->moveToGroup($newGroup)){
         throw new Exception("Error moving new user to individual group");
       }
     }
-  }
 
-  public function getRequestingGroup(){
-    if($this->getRequestingGroupId() != null){
-      return Database::getInstance()->fetch("ballot_groups", "`id`='".$this->getRequestingGroupId()."'")[0];
+    //Initialise groups
+    if($this->data['groupid'] != null){
+      $this->group = new Group($this->data['groupid']);
     }
-    return null;
+
+    if($this->data['requesting'] != null){
+      $this->requestingGroup = new Group($this->data['groupid']);
+    }
   }
 
   public function getCRSID(){
     return $this->crsid;
   }
 
-  public function getGroupName(){
-    return $this->data['groupname'];    
-  }
-
+  //Deprecated
   public function getGroupId(){
-    return intval($this->data['groupid']);
+    return $this->getGroup()->getId();
   }
 
   public function isIndividual(){
-    return $this->data['individual'] === "1";
+    return $this->getGroup()->isIndividual();
   }
+
   public function getId(){
     return intval($this->data['id']);
   }
@@ -121,32 +108,33 @@ class User {
     return intval($this->data['size']);
   }
 
+  //Deprecated
   public function getRequestingGroupId(){
-    if($this->data['requesting'] != ""){
-      return intval($this->data['requesting']);
+    if($this->getRequestingGroup() != null){
+      return $this->getRequestingGroup()->getId();
     }else{
       return null;
     }
   }
 
-  public function ownsGroup($gid){
-    //Check if user owns group
-    $db = Database::getInstance();
-
-    $result = $db->query(
-      "SELECT * FROM `ballot_groups`
-       JOIN `ballot_individuals` ON `owner`=`ballot_individuals`.`id`
-       WHERE `crsid`='".$this->getCRSID()."'
-       AND `ballot_groups`.`id`='".intval($gid)."';");
-
-     return ($result->num_rows > 0);
+  public function getRequestingGroup(){
+    return $this->requestingGroup;     
   }
 
-  public function moveToGroup($gid){
+  public function getGroup(){
+    return $this->group; 
+  }
+
+  public function ownsGroup($group){
+    //Check if user owns group
+    return $group->getOwnerID() == $this->getID();
+  }
+
+  public function moveToGroup($group){
     //Decrement current group size, increment new group size, update group ID field
     //If group will be empty, remove it
 
-    if(!$this->getGroupSize() == 1 && !$this->isIndividual() && $this->ownsGroup($this->data['groupid'])){
+    if($this->getGroup()->getSize() != 1 && !$this->isIndividual() && $this->ownsGroup($group)){
       echo "Group owner ".$this->getCRSID()." can't leave group<br />";
       return false;
     }
@@ -173,7 +161,8 @@ class User {
     if($db->transaction($queries)){
       //Update internal state
       $this->data['requesting'] = "";
-      $this->data['groupid'] = $gid;
+      $this->data['groupid'] = $group->getID();
+      $this->group = $group;
 
       return true;
     }else{
@@ -188,9 +177,5 @@ class User {
       $body,
       "MIME-Version: 1.0\r\nContent-type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit;"
     );
-  }
-
-  public function getEscapedGroupName(){
-    return htmlentities($this->getGroupName());
   }
 }
