@@ -26,7 +26,7 @@ class Group {
     $groupId = random_int(0, PHP_INT_MAX);
     $result = Database::getInstance()->insert("ballot_groups", [
       "id" => $groupId,
-      "name" => $individual ? $owner->getCRSID() : $name,
+      "name" => $individual ? $owner->getCRSID()." ".$groupId : $name,
       "owner" => $owner->getID(),
       "public" => false,
       "individual" => $individual,
@@ -40,6 +40,11 @@ class Group {
     }
   }
 
+  public static function maxSize(){
+    //Returns the maximum group size
+    return 9;
+  }
+
   public static function deleteGroup($group){
     $success = Database::getInstance()->delete("ballot_groups", "`id`='".$group->getID()."'");
     if(!$success){
@@ -49,6 +54,11 @@ class Group {
 
   public function getUnsafeName(){
     return $this->data['name'];
+  }
+
+  public function getBallotPriority(){
+    //Returns the ballot priority of this group
+    return 1;
   }
 
   public function getName(){

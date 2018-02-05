@@ -87,6 +87,16 @@ class User {
     return $this->crsid;
   }
 
+  public function getName(){
+    //Returns a user-facing name
+    return $this->crsid;
+  }
+
+  public function getBallotPriority(){
+    //Returns the ballot priority of the user
+    return 1;
+  }
+
   //Deprecated
   public function getGroupId(){
     return $this->getGroup()->getId();
@@ -96,7 +106,7 @@ class User {
     return $this->getGroup()->isIndividual();
   }
 
-  public function getId(){
+  public function getID(){
     return intval($this->data['id']);
   }
 
@@ -125,17 +135,36 @@ class User {
     return $this->group; 
   }
 
-  public function ownsGroup($group){
+  public function ownsGroup($group = null){
     //Check if user owns group
+    if($group == null){
+      $group = $this->getGroup();
+    }
+
     return $group->getOwnerID() == $this->getID();
+  }
+
+  public function canLeave(){
+    //Returns whether the user can leave the group they are currently in
+    return $this->isIndividual() || $this->getGroup()->getSize() == 1 || !$this->ownsGroup();
+  }
+
+  public function canJoin($group){
+    //Returns whether the user would be able to join this group
+    return $this->getGroup() != $group && $group->getSize() < Group::maxSize() && $group->getBallotPriority() == $this->getBallotPriority();
   }
 
   public function moveToGroup($group){
     //Decrement current group size, increment new group size, update group ID field
     //If group will be empty, remove it
 
-    if($this->getGroup()->getSize() != 1 && !$this->isIndividual() && $this->ownsGroup($this->getGroup())){
+    if(!$this->canLeave()){
       echo "Group owner ".$this->getCRSID()." can't leave their current group.<br />";
+      return false;
+    }
+
+    if(!$this->canJoin($group)){
+      echo "Cannot join a full group or a group with a different ballot priority than you<br />";
       return false;
     }
 

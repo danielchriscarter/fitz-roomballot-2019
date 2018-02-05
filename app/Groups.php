@@ -3,13 +3,13 @@ class Groups {
 
     public static function HTMLtop($user) { ?>
       <div class="container">
-        <h2>Welcome, <?= $user->getCRSID(); ?></h2>
+        <h2>Welcome, <?= $user->getName(); ?></h2>
         <p>
 <?        if(!$user->isIndividual()){
-            $owner = $user->ownsGroup($user->getGroup()); ?>
+            $owner = $user->ownsGroup(); ?>
             You are currently <?= $owner ? "owner" : "part" ?> of the group "<?= $user->getGroup()->getHTMLLink(); ?>"<br />
 
-<?          if(!$owner || $user->getGroup()->getSize() == 1){ ?>
+<?          if($user->canLeave()){ ?>
               <a href='?leave'>Leave this Group</a><br />
 <?          }
           }else{ ?>
@@ -25,10 +25,6 @@ class Groups {
 <?        } ?>
         </p>
 <?  }
-
-    public static function maxGroupSize(){
-      return 9;
-    }
 
     public static function getGroupQuery($id){
       if(is_numeric($id)){
@@ -111,9 +107,12 @@ class Groups {
     public static function HTMLcreate(){ ?>
       <h2>Create a New Group</h2>
       <form action="" method="POST">
-        <input name="groupname" maxlength="100" type="text" placeholder="Group Name" /><br />
-        <label for="public">Make this group visible publicly?</label> <input name="public" type="checkbox" value="false" /><br />
+        <input name="groupname" maxlength="100" type="text" placeholder="Group Name" style="width: 100%; margin-bottom: 5px;" /><br />
+        <input name="public" type="checkbox" value="false" style="vertical-align: top;"/> <label for="public" style="vertical-align: top;" >Make this group visible publicly?</label>  (This will allow anyone to request access)<br />
+
         <input type="submit" value="Create Group" />
+        <br /><br />
+        Note: rude or inappropriate group names may be subject to disciplinary action.
       </form>
 <?
     }
@@ -136,7 +135,7 @@ class Groups {
                   <td><?= $user->getGroup()->getHTMLLink(); ?></td>
                   <td><?= $user->getGroup()->getSize(); ?></td>
                   <td>
-<?                  if(!$user->ownsGroup($user->getGroup())){ ?>
+<?                  if($user->canLeave()){ ?>
                       <a href='?leave'>Leave this group</a>
 <?                  } ?>
                   </td>
