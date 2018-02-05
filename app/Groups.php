@@ -45,20 +45,40 @@ class Groups {
         <h2><?= $group->getName(); ?></h2> 
 
 <?      //Only show request link if not currently in the group, or requesting access
-        if($user->getGroup() != $group && $user->getRequestingGroup() != $group){ ?>
+        if($user->getGroup() != $group && $user->getRequestingGroup() != $group && $user->canJoin($group)){ ?>
           <a href='/groups?join&id=<?= $group->getID(); ?>'>Request to Join</a>
 <?      }else if($owner){ 
           $public = $group->isPublic(); ?>
           You are owner of this group.<br />
-          <b><a href='?join&id=<?= $group->getID(); ?>'>Share this link with others so they can join your group!</a></b><br />
           <a href='?change=<?= $group->getID(); ?>&public=<?= $public ? "0":"1" ?>'>Make group <?= $public ? "private" : "public" ?>.</a>
-<?      } ?>
+<?      }
+        
+        if($owner){
+          $link = "https://roomballot.fitzjcr.com/groups?join&id=".$group->getID(); ?>
+          <h3>Share this link with others so they can join your group!</h3> 
+          <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="sharelink" id="sharelink" onkeydown="return false;"><?= $link; ?></textarea>
+          <button id="copybutton">Copy Link To Clipboard</button>
+          <script>
+            var link = document.getElementById("sharelink");
+            var button = document.getElementById("copybutton");
 
+            button.onclick = function(e){
+              link.select();
+              if(document.execCommand('copy')){
+                this.innerHTML = "Link copied!";
+                window.getSelection().removeAllRanges();
+              }
+            }
+
+            button.style.height = link.style.height = (link.scrollHeight-10)+'px'; 
+          </script>
+<?      } ?>
         <h3>Members</h3>
         <table class="table table-condensed table-bordered table-hover">
           <thead>
             <tr>
               <td>CRSid</td>
+              <td>Name</td>
 <?            if($owner){ ?>
                 <td>Assign Ownership</td>
 <?            } ?>

@@ -5,3 +5,21 @@ tr.current-group {
 tr.current-request {
   background-color: #ffd992;
 }
+
+.sharelink {
+  padding: 10px;
+  font-family: monospace;
+  width: 60%;
+  vertical-align: middle;
+  resize: none;
+
+  background-color: #383838;
+  color: white;
+}
+
+@media (max-width: 767px) {
+  .sharelink {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
