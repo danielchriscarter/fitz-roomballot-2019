@@ -151,17 +151,21 @@ class Content {
           //User can only leave groups (>1) they're not owner for
           if($user->canLeave()){
             //Create individual group
-            $newGroup = Group::createGroup($user->getCRSID(), $user, true);
+            try{
+              $newGroup = Group::createGroup($user->getCRSID(), $user, true);
 
-            //Move user to this group
-            if($user->moveToGroup($newGroup)){ ?>
-              <b>You're now balloting alone. <a href='/groups'>Go back to Groups page</a></b>
+              //Move user to this group
+              if($user->moveToGroup($newGroup)){ ?>
+                <b>You're now balloting alone. <a href='/groups'>Go back to Groups page</a></b>
 <?
-            }else{ 
-              Group::deleteGroup($newGroup); ?>
-              <b>There was a problem leaving the group, please try again</b>
+              }else{ 
+                Group::deleteGroup($newGroup); ?>
+                <b>There was a problem leaving the group, please try again</b>
 <?
-            }
+              }
+            }catch(Exception $e){ ?>
+              <b>There was a problem creating an individual ballot entry. Please try again.</b>
+<?          }
           }else{ ?>
             <b>Group owner can't leave the group. You need to assign ownership to someone else.</b>
 <?
@@ -171,13 +175,17 @@ class Content {
             <div class='container'>
 <?
             //Do create operation
-            $group = Group::createGroup($_POST['groupname'], $user);
-            //Place user in group
-            if($user->moveToGroup($group)){
-              echo "<b>Group Created! ".$group->getHTMLLink("Go to group")."</b>";
-            }else{
-              Group::deleteGroup($group);
-              echo "<b>There was a problem creating the group.</b>";
+            try{
+              $group = Group::createGroup($_POST['groupname'], $user);
+              //Place user in group
+              if($user->moveToGroup($group)){
+                echo "<b>Group Created! ".$group->getHTMLLink("Go to group")."</b>";
+              }else{
+                Group::deleteGroup($group);
+                echo "<b>There was a problem moving you to the group.</b>";
+              }
+            }catch(Exception $e){
+              echo "<b>There was a problem creating the new group - the name may already exist</b>";
             }
           }else{
             Groups::HTMLtop($user);
