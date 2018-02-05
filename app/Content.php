@@ -57,7 +57,7 @@ class Content {
 
         Timetable::HTMLbottom();
     }
-    
+
     private static function groups(){
         //TODO: Replace this spaghetti with a templating engine.
 
@@ -65,7 +65,7 @@ class Content {
         $user = new User();
 
         if(count($_GET) > 1){ //At least one request ?>
-          <div class='container'><a href='/groups'>⇦ Group Ballot Home</a></div>   
+          <div class='container'><a href='/groups'>⇦ Group Ballot Home</a></div>
 <?      }
 
         if(isset($_GET['join'])){
@@ -75,7 +75,7 @@ class Content {
             $group = new Group($_GET['id']);
             $owner = new User($group->getOwnerID());
 
-            if($user->getGroup() == $group){ 
+            if($user->getGroup() == $group){
               echo "<b>You can't request access to your own group!</b>";
             }else if(!$user->canJoin($group)){
               echo "<b>You are not able to join this group</b>";
@@ -111,7 +111,7 @@ class Content {
 
           if($success){ ?>
             <b>You have succesfully cancelled your join request</b>
-<? 
+<?
           }else{
 ?>
             <b>There was an error cancelling your join request</a>
@@ -128,23 +128,21 @@ class Content {
             "SELECT * FROM `ballot_individuals`
              JOIN `ballot_groups` ON `requesting`=`ballot_groups`.`id`
              WHERE `owner`='".$user->getID()."' AND `requesting`='".$group->getID()."' AND `ballot_individuals`.`id`='".$toAccept->getID()."'";
-
           $result = Database::getInstance()->query($dbQuery);
-         
           if($result->num_rows > 0){
             //Move user to group
-            if($toAccept->moveToGroup($group)){ 
+            if($toAccept->moveToGroup($group)){
               $toAccept->sendEmail(
                 "You've been accepted into the ballot group '".$group->getUnsafeName()."'",
                 $group->getHTMLLink("Click here to view the group")
               );
             ?>
-              <b>You have accepted <?= $toAccept->getName(); ?> into your group.</b>             
+              <b>You have accepted <?= $toAccept->getName(); ?> into your group.</b>
 <?          }else{ ?>
-              <b>There was a problem accepting the request - are they owner of a different group? Are they in your year?</b>             
+              <b>There was a problem accepting the request - are they owner of a different group? Are they in your year?</b>
 <?          }
           }else{ ?>
-            <b>There was a problem accepting the request - they may no longer be requesting access, or you might not have permission to accept requests</b>     
+            <b>There was a problem accepting the request - they may no longer be requesting access, or you might not have permission to accept requests</b>
 <?
           }
         }else if(isset($_GET['leave'])){ ?>
@@ -160,7 +158,7 @@ class Content {
               if($user->moveToGroup($newGroup)){ ?>
                 <b>You're now balloting alone. <a href='/groups'>Go back to Groups page</a></b>
 <?
-              }else{ 
+              }else{
                 Group::deleteGroup($newGroup); ?>
                 <b>There was a problem leaving the group, please try again</b>
 <?
@@ -204,7 +202,7 @@ class Content {
           }
 
         }else if(isset($_GET['change'])){ ?>
-          <div class='container'>    
+          <div class='container'>
 <?        $group = new Group($_GET['change']);
           if($user->ownsGroup($group)){
             if(isset($_GET['public'])){
@@ -215,13 +213,12 @@ class Content {
               }
             }
           }
-        }else if(isset($_GET['assign'])){ 
+        }else if(isset($_GET['assign'])){
           if(isset($_GET['confirm'])){ ?>
-            <div class='container'>    
+            <div class='container'>
 <?          //Do some checks
             $group = new Group($_GET['group']);
             $newOwner = new User($_GET['assign']);
-            
             if(!$user->ownsGroup($group)){
               echo "<b>You don't own this group and so cannot assign owners</b>";
             }else if($newOwner->getGroup() != $group){
@@ -229,17 +226,17 @@ class Content {
             }else{
               //Set group owner to newOwner's ID
               $result = Database::getInstance()->update("ballot_groups", "`id`='".$group->getID()."' AND `owner`='".$user->getID()."'", ["owner"=>$newOwner->getID()]);
-              if($result){ 
-                echo "<b>You are no longer owner of ".$group->getName()."</b>"; 
-                $newOwner->sendEmail( 
-                  $user->getName()." has given you ownership of '".$group->getUnsafeName()."'", 
+              if($result){
+                echo "<b>You are no longer owner of ".$group->getName()."</b>";
+                $newOwner->sendEmail(
+                  $user->getName()." has given you ownership of '".$group->getUnsafeName()."'",
                   $group->getHTMLLink("Click here to view the group")
                 );
               }else{
                 echo "<b>There was an error removing you as owner</b>";
               }
             }
-          }else{ 
+          }else{
             Groups::HTMLtop($user); ?>
             <b>If you click confirm, you will no longer be owner of this group.</b><br />
             <a href='/groups?assign=<?= $_GET['assign']; ?>&group=<?= $_GET['group']; ?>&confirm'>Confirm.</a>
