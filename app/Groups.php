@@ -5,7 +5,7 @@ class Groups {
       <div class="container">
         <h2>Welcome, <?= $user->getName(); ?></h2>
         <p>
-<?        if(!$user->isIndividual()){
+<?        if($user != null && !$user->isIndividual()){
             $owner = $user->ownsGroup(); ?>
             You are currently <?= $owner ? "owner" : "part" ?> of the group "<?= $user->getGroup()->getHTMLLink(); ?>"<br />
 

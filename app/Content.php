@@ -59,6 +59,8 @@ class Content {
     }
     
     private static function groups(){
+        //TODO: Replace this spaghetti with a templating engine.
+
         //Load in user
         $user = new User();
 

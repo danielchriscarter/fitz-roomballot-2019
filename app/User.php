@@ -103,6 +103,10 @@ class User {
   }
 
   public function isIndividual(){
+    if($this->getGroup() == null){
+      return true; //No group === individual
+    }
+
     return $this->getGroup()->isIndividual();
   }
 
@@ -146,6 +150,7 @@ class User {
 
   public function canLeave(){
     //Returns whether the user can leave the group they are currently in
+    if($this->getGroup() == null) return true; //Can leave a "null" group
     return $this->isIndividual() || $this->getGroup()->getSize() == 1 || !$this->ownsGroup();
   }
 
