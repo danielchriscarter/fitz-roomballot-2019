@@ -56,7 +56,7 @@ class Database {
             }
         }
         $table = $this->prefix . $table;
-        $result = self::query("INSERT INTO `" . $table . "` (`" . implode("`, `", $rows) . "`) VALUES (" . implode(", ", $vals) . ");");
+        $result = $this->query("INSERT INTO `" . $table . "` (`" . implode("`, `", $rows) . "`) VALUES (" . implode(", ", $vals) . ");");
         return $result ? true : false;
     }
 
@@ -83,13 +83,13 @@ class Database {
             $pairs[] = "`" . $rows[$i] . "` = " . $vals[$i];
         }
         $table = $this->prefix . $table;
-        $result = self::query("UPDATE `" . $table . "` SET " . implode(", ", $pairs) . ($where ? " WHERE " . $where : "") . ";");
+        $result = $this->query("UPDATE `" . $table . "` SET " . implode(", ", $pairs) . ($where ? " WHERE " . $where : "") . ";");
         return $result ? true : false;
     }
 
     public function delete($table, $where) {
         $table = $this->prefix . $table;
-        $result = self::query("DELETE FROM `" . $table . "`" . ($where ? " WHERE " . $where : "") . ";");
+        $result = $this->query("DELETE FROM `" . $table . "`" . ($where ? " WHERE " . $where : "") . ";");
         return $result ? true : false;
     }
 
@@ -104,7 +104,7 @@ class Database {
             $conds .= " ORDER BY " . $sort;
         }
         $conds .= " LIMIT " . implode(", ", $limit);
-        $result = self::query("SELECT * FROM `" . $table . "`" . $conds . ";");
+        $result = $this->query("SELECT * FROM `" . $table . "`" . $conds . ";");
         $data = array();
 
         // only parse the data if we were sucessful
@@ -119,16 +119,16 @@ class Database {
     }
 
     public function transaction($queries){
-      self::query("START TRANSACTION");
+      $this->query("START TRANSACTION");
 
       foreach($queries as $q){
-        if( !self::query($q) ){
-          self::query("ROLLBACK");
+        if( !$this->query($q) ){
+          $this->query("ROLLBACK");
           return false;
         }
       }
 
-      self::query("COMMIT");
+      $this->query("COMMIT");
       return true;
     }
 }
