@@ -57,11 +57,11 @@ class User {
 			$this->data['requesting'] = null;
 
 			$insertSuccess = $db->insert("ballot_individuals", [
-				"id"=>$this->getID(),
-				"name"=>$this->crsid,
+				"id"=>$this->data['id'],
+				"name"=>$this->data['name'],
 				"crsid"=>$this->crsid,
-				"groupid"=>null,
-				"searching"=>false
+				"groupid"=>$this->data['groupid'],
+				"searching"=>$this->data['searching']
 			]);
 
 			if(!$insertSuccess){
