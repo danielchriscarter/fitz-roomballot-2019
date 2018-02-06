@@ -57,7 +57,7 @@ class Groups {
         
         if($owner){
           $link = "https://roomballot.fitzjcr.com/groups?join&id=".$group->getID(); ?>
-          <h3>Share this link with others so they can join your group!</h3> 
+          <h3>Share this link with others so they can join your group:</h3> 
           <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="sharelink" id="sharelink" onkeydown="return false;"><?= $link; ?></textarea>
           <button class="btn btn-default" id="copybutton">Copy Link To Clipboard</button>
           <script>

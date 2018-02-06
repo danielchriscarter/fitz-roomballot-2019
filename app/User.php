@@ -27,12 +27,12 @@ class User {
       if($result->num_rows > 0){ //User exists in DB
         $this->crsid = $result->fetch_assoc()['crsid'];
       }else{
-        throw new Exception("Can't find user in DB");
+        throw new Exception("Can't find user in database - do you have the correct link?");
       }
     }
 
     if($this->crsid == null){
-      throw new Exception("No such user in existence");
+      throw new Exception("No such user in existence - do you have the correct link?");
     }
 
     //Get user data from DB (e.g group ID)
@@ -189,12 +189,12 @@ class User {
     //If group will be empty, remove it
 
     if(!$this->canLeave()){
-      echo "Group owner ".$this->getCRSID()." can't leave their current group.<br />";
+      //echo "Group owner ".$this->getCRSID()." can't leave their current group.<br />";
       return false;
     }
 
     if(!$this->canJoin($group)){
-      echo "Cannot join a full group or a group with a different ballot priority than you<br />";
+      //echo "Cannot join a full group or a group with a different ballot priority than you<br />";
       return false;
     }
 
