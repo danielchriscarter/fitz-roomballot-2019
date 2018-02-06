@@ -69,7 +69,7 @@ class User {
 			}
 
 			//Create a new individual group for this user
-			$newGroup = Group::createGroup($this->crsid, $this, true);
+			$newGroup = Group::createGroup($this->data['name'], $this, true);
 
 			if(!$this->moveToGroup($newGroup)){
 				throw new Exception("Error moving new user to individual group.");
