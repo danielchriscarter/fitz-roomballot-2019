@@ -68,7 +68,7 @@ class User {
 				throw new Exception("Error adding user to database.");
 			}
 
-			//Create a new individual group for this user
+			// Create a new individual group for this user
 			$newGroup = Group::createGroup($this->data['name'], $this, true);
 
 			if(!$this->moveToGroup($newGroup)){
@@ -76,7 +76,7 @@ class User {
 			}
 		}
 
-		//Initialise groups
+		// Initialise groups
 		if($this->data['groupid'] != null){
 			$this->group = new Group($this->data['groupid']);
 		}
@@ -86,22 +86,22 @@ class User {
 		}
 	}
 
-	public function getCRSID(){
+	public function getCRSID() {
 		return $this->crsid;
 	}
 
-	public function getName(){
-		//Returns a user-facing name
+	public function getName() {
+		// Returns a user-facing name
 		return $this->data['name'];
 	}
 
-	public function getBallotPriority(){
-		//Returns the ballot priority of the user
+	public function getBallotPriority() {
+		// Returns the ballot priority of the user
 		return Group::GroupPriority($this->data['priority']);
 	}
 
-	public function getBallotPriorityForDB(){
-		//Returns the ballot priority string, for looking up in DB
+	public function getBallotPriorityForDB() {
+		// Returns the ballot priority string, for looking up in DB
 		switch($this->data['priority']){
 			case "SCHOLARSECOND":
 			case "SECONDYEAR":
@@ -116,121 +116,120 @@ class User {
 		}
 	}
 
-	public function isScholar(){
-		//Returns whether this user is a scholar.
+	public function isScholar() {
+		// Returns whether this user is a scholar.
 		return $this->data['priority'] == "SCHOLARSECOND" || $this->data['priority'] == "SCHOLARTHIRD";
 	}
 
-	//Deprecated
-	public function getGroupId(){
+	//
+	// getGroupId is deprecated
+	//	
+	public function getGroupId() {
 		return $this->getGroup()->getId();
 	}
 
-	public function isIndividual(){
-		if($this->getGroup() == null){
-			return true; //No group === individual
+	public function isIndividual() {
+		if($this->getGroup() == null) {
+			// No group === individual
+			return true;
 		}
-
 		return $this->getGroup()->isIndividual();
 	}
 
-	public function getID(){
+	public function getID() {
 		return intval($this->data['id']);
 	}
 
-	public function getEmail(){
+	public function getEmail() {
 		return $this->getCRSID()."@cam.ac.uk";
 	}
 	
-	public function getGroupSize(){
+	public function getGroupSize() {
 		return intval($this->data['size']);
 	}
 
-	//Deprecated
-	public function getRequestingGroupId(){
-		if($this->getRequestingGroup() != null){
+	//
+	// getRequestingGroupId is deprecated
+	//
+	public function getRequestingGroupId() {
+		if ($this->getRequestingGroup() != null) {
 			return $this->getRequestingGroup()->getId();
-		}else{
+		} else {
 			return null;
 		}
 	}
 
-	public function getRequestingGroup(){
+	public function getRequestingGroup() {
 		return $this->requestingGroup;     
 	}
 
-	public function getGroup(){
+	public function getGroup() {
 		return $this->group; 
 	}
 
-	public function ownsGroup($group = null){
-		//Check if user owns group
-		if($group == null){
+	public function ownsGroup($group = null) {
+		// Check if user owns group
+		if ($group == null) {
 			$group = $this->getGroup();
 		}
 
 		return $group->getOwnerID() == $this->getID();
 	}
 
-	public function canLeave(){
-		//Returns whether the user can leave the group they are currently in
-		if($this->getGroup() == null) return true; //Can leave a "null" group
+	public function canLeave() {
+		// Returns whether the user can leave the group they are currently in
+		// They may leave a "null" group
+		if ($this->getGroup() == null) return true;
 		return $this->isIndividual() || $this->getGroup()->getSize() == 1 || !$this->ownsGroup();
 	}
 
 	public function canJoin($group){
-		//Returns whether the user would be able to join this group
-		if($this->getGroup() != $group && $group->getSize() < Group::maxSize()){
+		// Returns whether the user can join a group
+		if ($this->getGroup() != $group && $group->getSize() < Group::maxSize()) {
 			return $this->getBallotPriority() == $group->getBallotPriority();
 		}
 	}
 
-	public function moveToGroup($group){
-		//Decrement current group size, increment new group size, update group ID field
-		//If group will be empty, remove it
-
-		if(!$this->canLeave()){
+	public function moveToGroup($group) {
+		// Decrement current group size, increment new group size, update group ID field
+		// If group will be empty, remove it
+		if (!$this->canLeave()) {
 			//echo "Group owner ".$this->getCRSID()." can't leave their current group.<br />";
 			return false;
 		}
-
-		if(!$this->canJoin($group)){
+		if (!$this->canJoin($group)) {
 			//echo "Cannot join a full group or a group with a different ballot priority than you<br />";
 			return false;
 		}
 
 		$db = Database::getInstance();
-		
 		$queries = [];
-		
 		$queries[] = "UPDATE `ballot_groups` SET `size` = `size`+1 WHERE `id`='".$group->getID()."'";
 		$queries[] = "UPDATE `ballot_individuals` SET `groupid`='".$group->getID()."',`requesting`=NULL WHERE `id`='".$this->getID()."'";
-
-		if($this->data['groupid'] != null){
+		if ($this->data['groupid'] != null) {
 			$oldGroup = $db->fetch("ballot_groups", "`id`='".$this->data['groupid']."'");
-			if(count($oldGroup) > 0){
-					if(intval($oldGroup[0]['size']) == 1){
-						$queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
-					}else{
-						$queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
-					}
+			if (count($oldGroup) > 0) {
+				if (intval($oldGroup[0]['size']) == 1) {
+					$queries[] = "DELETE FROM `ballot_groups` WHERE `id`='".$this->data['groupid']."'";
+				} else {
+					$queries[] = "UPDATE `ballot_groups` SET `size`=`size`-1 WHERE `id`='".$this->data['groupid']."'";
+				}
 			}
 		}
 		
 
 		if($db->transaction($queries)){
-			//Update internal state
+			// Update internal state
 			$this->data['requesting'] = "";
 			$this->data['groupid'] = $group->getID();
 			$this->group = $group;
-
 			return true;
-		}else{
+		} else {
 			return false;
 		}
 	}
 
-	public function sendEmail($subject, $body){
+	public function sendEmail($subject, $body) {
 		mail(
 			$this->getEmail(), 
 			"=?UTF-8?B?" . base64_encode($subject) . "?=",
