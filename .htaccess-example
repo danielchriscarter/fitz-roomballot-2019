@@ -11,7 +11,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^houses/(.*)$ index.php?q=houses&url=$1 [L,QSA]
 RewriteRule ^rooms/(.*)$ index.php?q=rooms&url=$1 [L,QSA]
-RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+RewriteRule ^([^/]*)$ index.php?q=$1 [L,QSA]
 
 AuthType Ucam-WebAuth
 
