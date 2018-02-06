@@ -141,6 +141,22 @@ class Groups {
 <?
     }
 
+    public static function HTMLsuccess(string $string){ ?>
+      <div class="container">
+        <div class="alert alert-success">
+          <?= $string; ?>
+        </div>
+      </div>
+<?  }
+
+    public static function HTMLerror(string $string){ ?>
+      <div class="container">
+        <div class="alert alert-danger">
+          <?= $string; ?>
+        </div>
+      </div>
+<?  }
+
     public static function HTMLgroupList($result, $user = null){
         if($result->num_rows > 0 || ($user != null && (!$user->isIndividual() || $user->getRequestingGroup() != null))){ ?>
           <h2>Groups Visible to You</h2>
