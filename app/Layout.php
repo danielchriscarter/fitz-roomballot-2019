@@ -50,19 +50,19 @@ class Layout {
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			  	<ul class="nav navbar-nav navbar-right">
-					<li><a href="news">Latest News</a></li>
-					<li><a href="timetable">Ballot Timetable</a></li>
+					<li><a href="/news">Latest News</a></li>
+					<li><a href="/timetable">Ballot Timetable</a></li>
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Ballot Order <span class="caret"></span></a>
 					  	<ul class="dropdown-menu">
-							<li><a href="order">Order of the Ballot</a></li>
-							<li><a href="shadow">Shadow Ballot</a></li>
+							<li><a href="/order">Order of the Ballot</a></li>
+							<li><a href="/shadow">Shadow Ballot</a></li>
 					  	</ul>
 					</li>
-					<li><a href="guide">Ballot Guide</a></li>
-					<li><a href="rooms">Rooms in the Ballot</a></li>
-					<li><a href="houses">Houses in the Ballot</a></li>
-					<li><a href="groups">Ballot Group Selection</a></li>
+					<li><a href="/guide">Ballot Guide</a></li>
+					<li><a href="/rooms">Rooms in the Ballot</a></li>
+					<li><a href="/houses">Houses in the Ballot</a></li>
+					<li><a href="/groups">Ballot Group Selection</a></li>
 				</ul>
 			</div><!-- /.navbar-collapse -->
 		  </div><!-- /.container-fluid -->
