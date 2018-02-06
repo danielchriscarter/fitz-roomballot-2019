@@ -8,10 +8,11 @@ class Groups {
 <?        if($user != null && !$user->isIndividual()){
             $owner = $user->ownsGroup(); ?>
             You are currently <?= $owner ? "owner" : "part" ?> of the group "<?= $user->getGroup()->getHTMLLink(); ?>"<br />
-            To leave this group, you need to assign ownership to someone else.
 
 <?          if($user->canLeave()){ ?>
               <a href='?leave'>Leave this Group</a><br />
+<?          }else{ ?>
+              To leave this group, you need to assign ownership to someone else.
 <?          }
           }else{ ?>
             You are currently balloting alone.<br />
@@ -58,7 +59,7 @@ class Groups {
           $link = "https://roomballot.fitzjcr.com/groups?join&id=".$group->getID(); ?>
           <h3>Share this link with others so they can join your group!</h3> 
           <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="sharelink" id="sharelink" onkeydown="return false;"><?= $link; ?></textarea>
-          <button id="copybutton">Copy Link To Clipboard</button>
+          <button class="btn" id="copybutton">Copy Link To Clipboard</button>
           <script>
             var link = document.getElementById("sharelink");
             var button = document.getElementById("copybutton");
@@ -67,6 +68,7 @@ class Groups {
               link.select();
               if(document.execCommand('copy')){
                 this.innerHTML = "Link copied!";
+                this.className = "btn btn-success";
                 window.getSelection().removeAllRanges();
               }
             }
