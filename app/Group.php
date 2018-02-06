@@ -5,23 +5,41 @@
 require_once "Database.php";
 
 class Group {
+  const SCHOLARSECOND = 1;
+  const SCHOLARTHIRD = 2;
+  const SECONDYEAR = 3;
+  const THIRDYEAR = 4;
+  const FIRSTYEAR = 5;
+
   private $data;
 
   public function __construct($id){
     //Get DB info from id supplied
     $id = intval($id);
-    $query = "SELECT `ballot_groups`.`id` as `id`, `ballot_groups`.`name` as `name`, `owner`, `public`, `individual`, `size`, `crsid` FROM ballot_groups
+    $query = "SELECT `ballot_groups`.`id` as `id`, `ballot_groups`.`name` as `name`, `owner`, `public`, `individual`, `size`, `crsid`,`priority` FROM ballot_groups
               JOIN `ballot_individuals` ON `owner`=`ballot_individuals`.`id`
               WHERE `ballot_groups`.`id`='$id'";
     $result = Database::getInstance()->query($query);
 
     if($result->num_rows == 0){
-      throw new Exception("Group $id not found");
+      throw new Exception("This group was not found (with ID $id)");
     }
     
     $this->data = $result->fetch_assoc();
   }
 
+  public static function GroupPriority($string){
+    switch($string){
+      case "SCHOLARSECOND":
+      case "SECONDYEAR":
+        return Group::SECONDYEAR;
+      case "SCHOLARTHIRD":
+      case "THIRDYEAR":
+        return Group::THIRDYEAR;
+      case "FIRSTYEAR":
+        return Group::FIRSTYEAR;
+    }
+  }
   public static function createGroup($name, $owner, $individual = false){
     $groupId = random_int(0, PHP_INT_MAX);
     $result = Database::getInstance()->insert("ballot_groups", [
@@ -58,7 +76,7 @@ class Group {
 
   public function getBallotPriority(){
     //Returns the ballot priority of this group
-    return 1;
+    return Group::GroupPriority($this->data['priority']);
   }
 
   public function getName(){
@@ -110,7 +128,7 @@ class Group {
   }
 
   public function getMemberList(){
-    $query = "SELECT `ballot_individuals`.`id` as `id`, `crsid`
+    $query = "SELECT `ballot_individuals`.`id` as `id`, `ballot_individuals`.`name` as `name`, `crsid`
               FROM `ballot_groups`
               JOIN `ballot_individuals`
               ON `groupid`=`ballot_groups`.`id` 
@@ -124,7 +142,7 @@ class Group {
   }
 
   public function getRequestingList(){
-    $query = "SELECT `ballot_individuals`.`id` as `id`, `crsid`
+    $query = "SELECT `ballot_individuals`.`id` as `id`, `crsid`, `ballot_individuals`.`name`
               FROM `ballot_groups`
               JOIN `ballot_individuals`
               ON `requesting`=`ballot_groups`.`id` 

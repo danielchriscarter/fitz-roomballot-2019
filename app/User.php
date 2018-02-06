@@ -50,12 +50,14 @@ class User {
 
       //Populate data
       $this->data['id'] = random_int(0, PHP_INT_MAX);
+      $this->data['name'] = $this->crsid;
       $this->data['searching'] = false;
       $this->data['groupid'] = null;
       $this->data['requesting'] = null;
 
       $insertSuccess = $db->insert("ballot_individuals", [
         "id"=>$this->getID(),
+        "name"=>$this->crsid,
         "crsid"=>$this->crsid,
         "groupid"=>null,
         "searching"=>false
@@ -89,12 +91,33 @@ class User {
 
   public function getName(){
     //Returns a user-facing name
-    return $this->crsid;
+    return $this->data['name'];
   }
 
   public function getBallotPriority(){
     //Returns the ballot priority of the user
-    return 1;
+    return Group::GroupPriority($this->data['priority']);
+  }
+
+  public function getBallotPriorityForDB(){
+    //Returns the ballot priority string, for looking up in DB
+    switch($this->data['priority']){
+      case "SCHOLARSECOND":
+      case "SECONDYEAR":
+        return "'SCHOLARSECOND','SECONDYEAR'";
+      case "SCHOLARTHIRD":
+      case "THIRDYEAR":
+        return "'SCHOLARTHIRD','THIRDYEAR'";
+      case "FIRSTYEAR":
+        return "'FIRSTYEAR'";
+      default:
+        return "";
+    }
+  }
+
+  public function isScholar(){
+    //Returns whether this user is a scholar.
+    return $this->data['priority'] == "SCHOLARSECOND" || $this->data['priority'] == "SCHOLARTHIRD";
   }
 
   //Deprecated
@@ -156,7 +179,9 @@ class User {
 
   public function canJoin($group){
     //Returns whether the user would be able to join this group
-    return $this->getGroup() != $group && $group->getSize() < Group::maxSize() && $group->getBallotPriority() == $this->getBallotPriority();
+    if($this->getGroup() != $group && $group->getSize() < Group::maxSize()){
+      return $this->getBallotPriority() == $group->getBallotPriority();
+    }
   }
 
   public function moveToGroup($group){

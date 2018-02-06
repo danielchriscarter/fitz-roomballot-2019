@@ -72,33 +72,37 @@ class Content {
           if(isset($_GET['id'])){?>
             <div class='container'>
 <?
-            $group = new Group($_GET['id']);
-            $owner = new User($group->getOwnerID());
+            try{
+              $group = new Group($_GET['id']);
+              $owner = new User($group->getOwnerID());
 
-            if($user->getGroup() == $group){
-              echo "<b>You can't request access to your own group!</b>";
-            }else if(!$user->canJoin($group)){
-              echo "<b>You are not able to join this group</b>";
-            }else if($user->getRequestingGroup() == $group){
-              echo "<b>You are already requesting access to this group.</b>";
-            }else{
-              //Do join request operation
-              $success = Database::getInstance()->update("ballot_individuals", "`id`='".$user->getId()."'", [
-                "requesting"=>$group->getID()
-              ]);
+              if($user->getGroup() == $group){
+                echo "<b>You can't request access to your own group!</b>";
+              }else if(!$user->canJoin($group)){
+                echo "<b>You are not able to join this group - is it full, or are you in a different year?</b>";
+              }else if($user->getRequestingGroup() == $group){
+                echo "<b>You are already requesting access to this group.</b>";
+              }else{
+                //Do join request operation
+                $success = Database::getInstance()->update("ballot_individuals", "`id`='".$user->getId()."'", [
+                  "requesting"=>$group->getID()
+                ]);
 
-              $owner->sendEmail(
-                $user->getName()." has requested to join your ballot group '".$group->getUnsafeName()."'",
-                "<a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroup()->getID()."'>Click here to accept this request</a>"
-              );
-              if($success){ ?>
-                <b>You have succesfully requested to join <?= $group->getHTMLLink(); ?></a></b>
-<?              if(!$user->canLeave()){ ?>
-                  <br /><b>You will not be able to join the new group while you own your current one.</b>
-<?              }
-              }else{ ?>
-                <b>There was a problem requesting access to this group</b>
-<?            }
+                $owner->sendEmail(
+                  $user->getName()." has requested to join your ballot group '".$group->getUnsafeName()."'",
+                  "<a href='https://roomballot.fitzjcr.com/groups?accept=".$user->getId()."&group=".$owner->getGroup()->getID()."'>Click here to accept this request</a>"
+                );
+                if($success){ ?>
+                  <b>You have succesfully requested to join <?= $group->getHTMLLink(); ?></a></b>
+  <?              if(!$user->canLeave()){ ?>
+                    <br /><b>You will not be able to join the new group while you own your current one.</b>
+  <?              }
+                }else{ ?>
+                  <b>There was a problem requesting access to this group</b>
+  <?            }
+              }
+            }catch(Exception $e){
+              echo "<b>".$e->getMessage()."</b>";
             }
           }
         }else if(isset($_GET['cancel'])){ ?>
@@ -243,12 +247,14 @@ class Content {
 <?        }
         }else{ //Show public groups
           Groups::HTMLtop($user);
-          $queryString = "SELECT * FROM `ballot_groups` 
+          $queryString = "SELECT `ballot_groups`.`id` as `id`, `ballot_groups`.`name` as `name`, `size` FROM `ballot_groups` 
+                          JOIN `ballot_individuals` ON `ballot_groups`.`owner`=`ballot_individuals`.`id`
                           WHERE `public`=TRUE AND 
-                          `id`!='".$user->getGroup()->getID()."' 
-                          AND `size`< ".Group::maxSize();
+                          `ballot_groups`.`id`!='".$user->getGroup()->getID()."' 
+                          AND `priority` IN (".$user->getBallotPriorityForDB().")
+                          AND `size` < ".Group::maxSize();
           if($user->getRequestingGroup()){
-            $queryString .= " AND `id`!='".$user->getRequestingGroup()->getID()."'";
+            $queryString .= " AND `ballot_groups`.`id`!='".$user->getRequestingGroup()->getID()."'";
           }
 
           $result = Database::getInstance()->query($queryString);

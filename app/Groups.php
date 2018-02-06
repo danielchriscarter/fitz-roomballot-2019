@@ -8,6 +8,7 @@ class Groups {
 <?        if($user != null && !$user->isIndividual()){
             $owner = $user->ownsGroup(); ?>
             You are currently <?= $owner ? "owner" : "part" ?> of the group "<?= $user->getGroup()->getHTMLLink(); ?>"<br />
+            To leave this group, you need to assign ownership to someone else.
 
 <?          if($user->canLeave()){ ?>
               <a href='?leave'>Leave this Group</a><br />
@@ -20,7 +21,7 @@ class Groups {
           if($user->getRequestingGroup()){ ?>
             You are currently requesting access to the group "<?= $user->getRequestingGroup()->getHTMLLink(); ?>"<br />
 <?        } 
-          if(!isset($_GET['create'])){ ?>
+          if(!isset($_GET['create']) && $user->canLeave()){ ?>
             <a href='?create'>Create a new Group</a>
 <?        } ?>
         </p>
@@ -87,6 +88,7 @@ class Groups {
 <?        foreach($members as $member){ ?>
             <tr>
               <td><?= $member['crsid']; ?></td>
+              <td><?= $member['name']; ?></td>
 <?              if($owner){
                   if($user->getCRSID() == $member['crsid']) {?>
                     <td></td>
@@ -106,12 +108,14 @@ class Groups {
               <thead>
                 <tr>
                   <td>CRSid</td>
+                  <td>Name</td>
                   <td>Accept Request</td>
                 </tr>
               </thead>
 <?          foreach($requesting as $member){ ?>
               <tr>
                 <td><?= $member['crsid']; ?></td>
+                <td><?= $member['name']; ?></td>
                 <td><a href='?accept=<?= $member['id']; ?>&group=<?= $group->getID(); ?>'>Accept Request</a></td>
               </tr>
 <?          }
