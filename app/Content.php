@@ -115,7 +115,7 @@ class Content {
           if($success){ 
             Groups::HTMLsuccess("You have succesfully cancelled your join request. <a href='/groups'>Go back to ballot home.</a>");
           }else{
-            Groups::HTMLerror("There was an error cancelling your join request. <a href='/groups'>Go back to ballot home.</a>");
+            Groups::HTMLwarning("There was an error cancelling your join request. <a href='/groups'>Go back to ballot home.</a>");
           }
         }else if(isset($_GET['accept'])){
           Groups::HTMLtop($user);
@@ -190,7 +190,7 @@ class Content {
             $group = new Group($_GET['view']);
             Groups::HTMLgroupView($user, $group);
           }catch(Exception $e){
-            echo "<b>".$e->getMessage()."</b>";
+            Groups::HTMLerror($e->getMessage());
           }
 
         }else if(isset($_GET['change'])){

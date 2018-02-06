@@ -22,7 +22,7 @@ class Group {
     $result = Database::getInstance()->query($query);
 
     if($result->num_rows == 0){
-      throw new Exception("This group was not found (with ID $id)");
+      throw new Exception("This group was not found (with ID $id). Has it been deleted?");
     }
     
     $this->data = $result->fetch_assoc();

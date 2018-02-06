@@ -59,7 +59,7 @@ class Groups {
           $link = "https://roomballot.fitzjcr.com/groups?join&id=".$group->getID(); ?>
           <h3>Share this link with others so they can join your group!</h3> 
           <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="sharelink" id="sharelink" onkeydown="return false;"><?= $link; ?></textarea>
-          <button class="btn" id="copybutton">Copy Link To Clipboard</button>
+          <button class="btn btn-default" id="copybutton">Copy Link To Clipboard</button>
           <script>
             var link = document.getElementById("sharelink");
             var button = document.getElementById("copybutton");
@@ -120,8 +120,9 @@ class Groups {
                 <td><?= $member['name']; ?></td>
                 <td><a href='?accept=<?= $member['id']; ?>&group=<?= $group->getID(); ?>'>Accept Request</a></td>
               </tr>
-<?          }
-          }
+<?          } ?>
+            </table> 
+<?        }
         }
       }
     }
@@ -146,6 +147,14 @@ class Groups {
     public static function HTMLsuccess(string $string){ ?>
       <div class="container">
         <div class="alert alert-success">
+          <?= $string; ?>
+        </div>
+      </div>
+<?  }
+
+    public static function HTMLwarning(string $string){ ?>
+      <div class="container">
+        <div class="alert alert-warning">
           <?= $string; ?>
         </div>
       </div>
