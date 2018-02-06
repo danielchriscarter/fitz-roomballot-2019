@@ -155,7 +155,7 @@ class Groups {
 <?
             if($user != null){
               if(!$user->isIndividual()){ ?>
-                <tr class='current-group'>
+                <tr class='bg-success'>
                   <td><?= $user->getGroup()->getHTMLLink(); ?></td>
                   <td><?= $user->getGroup()->getSize(); ?></td>
                   <td>
@@ -167,7 +167,7 @@ class Groups {
 <?            }
 
               if($user->getRequestingGroup() != null){ ?>
-                <tr class='current-request'>
+                <tr class='bg-warning'>
                   <td><?= $user->getRequestingGroup()->getHTMLLink(); ?></td>
                   <td><?= $user->getRequestingGroup()->getSize(); ?></td>
                   <td><a href='?cancel'>Cancel join request</a></td>
