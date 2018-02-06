@@ -234,7 +234,7 @@ class User {
 			$this->getEmail(), 
 			"=?UTF-8?B?" . base64_encode($subject) . "?=",
 			$body,
-			"MIME-Version: 1.0\r\nContent-type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit;"
+			"MIME-Version: 1.0\r\nContent-type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit"
 		);
 	}
 }
