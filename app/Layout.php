@@ -44,7 +44,7 @@ class Layout {
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="home">Fitz JCR Housing Ballot System</a>
+				<a class="navbar-brand" href="/home">Fitz JCR Housing Ballot System</a>
 			</div>
 
 			<!-- Collect the nav links, forms, and other content for toggling -->

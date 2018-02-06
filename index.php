@@ -10,7 +10,7 @@ require_once "app/Content.php";
 ob_start();
 
 // if no page is requested then serve up the home page
-if (isset($_GET["q"])) {
+if (isset($_GET["q"]) && $_GET['q'] != "") {
     $url = rtrim($_GET["q"], "/");
 } else {
     $url = "home";
