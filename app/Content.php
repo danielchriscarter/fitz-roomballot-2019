@@ -7,6 +7,7 @@ require_once "lib/Michelf/SmartyPants.php";
 require_once "News.php";
 require_once "Timetable.php";
 require_once "Groups.php";
+require_once "Rooms.php";
 require_once "Group.php";
 require_once "User.php";
 
@@ -22,6 +23,13 @@ class Content {
                 break;
             case "groups":
                 Content::groups();
+                break;
+            case "rooms":
+                Content::rooms(true);
+                break;
+            case "houses":
+                Content::rooms(false);
+                break;
         }
     }
 
@@ -56,6 +64,35 @@ class Content {
         }
 
         Timetable::HTMLbottom();
+    }
+
+    private static function rooms($room = true){
+      if(isset($_GET['url'])){
+        $db = Database::getInstance();
+        $roomname = $db->escape($_GET['url']);
+
+        $roomQuery = "SELECT * FROM `rooms` WHERE `url`='$roomname'";
+        $imageQuery = "SELECT *, `room_images`.`description` as `description` FROM `room_images`
+                       JOIN `rooms` on `roomid`=`rooms`.`id`
+                       WHERE `rooms`.`url`='$roomname'";
+        $quoteQuery = "SELECT * FROM `room_quotes`
+                       JOIN `rooms` on `roomid`=`rooms`.`id`
+                       WHERE `rooms`.`url`='$roomname'";
+
+        $roomResult = $db->query($roomQuery);
+        if($roomResult->num_rows > 0){
+          $room = $roomResult->fetch_assoc();
+          $imageResult = $db->query($imageQuery);
+          $quoteResult = $db->query($quoteQuery);
+
+          Rooms::HTMLroomView($room, $imageResult, $quoteResult);
+        }
+      }else{
+        //Display a picker for rooms / houses
+        if($room){
+          Rooms::HTMLroomSelector();
+        }
+      }
     }
 
     private static function groups(){
