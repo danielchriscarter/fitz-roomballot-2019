@@ -1,6 +1,7 @@
 <?php
 
 require_once "Database.php";
+require_once "Environment.php";
 require_once "lib/Michelf/MarkdownInterface.php";
 require_once "lib/Michelf/Markdown.php";
 require_once "lib/Michelf/SmartyPants.php";
@@ -29,6 +30,9 @@ class Content {
                 break;
             case "houses":
                 Content::rooms(false);
+                break;
+            case "admin":
+                Content::admin();
                 break;
         }
     }
@@ -93,6 +97,33 @@ class Content {
           Rooms::HTMLroomSelector();
         }
       }
+    }
+
+    private static function admin(){
+      $user = new User();
+      if($user->getCRSID() != Environment::admin_crsid){
+        echo "You do not have admin permission";
+        return;
+      }
+
+      //Generate groups for every user
+      $query = "SELECT * FROM `ballot_individuals` WHERE `groupid` IS NULL";
+      $result = Database::getInstance()->query($query);
+
+      echo "Generating ".$result->num_rows." individual groups\n"; 
+      $success = 0;
+      while($row = $result->fetch_assoc()){
+        //creating the user is enough to create a group
+        try{
+          $user = new User($row['id']);
+          $success += 1;
+        }catch(Exception $e){
+          echo "Error: ".$e->getMessage()."\n";
+          var_dump($row);
+        }
+      }
+
+      echo "Generated $success groups\n";
     }
 
     private static function groups(){
