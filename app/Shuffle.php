@@ -20,6 +20,21 @@ class Shuffle {
 		return self::$instance;
 	}
 
+	public function shuffle($groups) {
+		mt_srand($seededValue);
+		// https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
+		n = count($groups);
+		for ($i = 0; $i <  n - 2; $i++) {
+			$j = mt_rand(i, n);
+			$temp = $groups[i];
+			$groups[i] = $groups[j];
+			$groups[j] = $temp;
+		}
+		return array(
+			"groups" => $groups,
+			"seed" => $seededValue);
+	}
+
 	private static function getSeed() {
 		$session = curl_init("https://www.random.org/integers/?num=1&min=100000000&max=1000000000&col=5&base=10&format=plain&rnd=new");
 		curl_setopt($session, CURLOPT_HTTPGET, true);
