@@ -5,7 +5,7 @@ class Environment {
 	// app enviromental variables
 	const app_hostname = "roomballot.fitzjcr.com";
 
-	// One CRSid that can take admin action
+	// one CRSid that can take admin action
 	const admin_crsid = "abcd1234";
 
 	// set the following to true and add a message to disable the site to visitors
@@ -21,6 +21,9 @@ class Environment {
 
 	// Raven authentication module enviromental variables
 	const raven_cookieKey = "";       // this needs to be 32+ random characters
+
+	// read only mode
+	const db_read_only = FALSE;       // prevent INSERT UPDATE DELETE database operations
 
 }
 

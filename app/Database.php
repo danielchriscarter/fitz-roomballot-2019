@@ -24,6 +24,17 @@ class Database {
     }
 
     public function query($query) {
+        if (Environment::db_read_only) {
+            if (strpos($query, "INSERT") !== false) {
+                throw new Exception("Unable to insert. Database is read only.");
+            }
+            if (strpos($query, "UPDATE") !== false) {
+                throw new Exception("Unable to update. Database is read only.");
+            }
+            if (strpos($query, "DELETE") !== false) {
+                throw new Exception("Unable to delete. Database is read only.");
+            }
+        }
         return mysqli_query($this->conn, $query);
     }
 
