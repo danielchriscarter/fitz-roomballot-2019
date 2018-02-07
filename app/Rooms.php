@@ -66,25 +66,55 @@ class Rooms {
 
   public static function HTMLimageView($images){ 
     if($images->num_rows > 0){ ?>
-      <div class="row">
+      <div id="gallery">
 
-<?    while($image = $images->fetch_assoc()){ 
+<?    $descriptions = [];
+      $plainDescriptions = [];
+      $srcs = [];
+      while($image = $images->fetch_assoc()){ 
+        $srcs[] = $image['src'];
+        $plainDescriptions[] = $image['description'];
         $description = Markdown::defaultTransform($image['description']);
-        $description = SmartyPants::defaultTransform($description); ?>
-        <div class="col-sm-6">
+        $descriptions[] = SmartyPants::defaultTransform($description); ?>
+<?    } ?>
+
+        <div id="large">
           <div class="thumbnail">
-            <a href='<?= $image['src']; ?>'>
-              <img src="<?= $image['src'] ?>" style="width: 100%;"/>
-              <div class="caption">
-                <p>
-                  <?= $description; ?>
-                </p>
+            <a href='<?= $srcs[0] ?>'>
+              <img id="gallery-large" src="<?= $srcs[0] ?>" title="<?= $plainDescriptions[0] ?>" style="width: 100%;"/>
+              <div id="gallery-caption" class="caption">
+                <?= $descriptions[0]; ?>
               </div>
             </a>
           </div>
         </div>
-<?    } ?>
+        <div id="smalls" class='ballot-smalls'>
+<?        for($i = 0; $i < count($srcs); $i++){ ?>
+            <a href="<?= $srcs[$i] ?>">
+              <img class="ballot-gallery" src="<?= $srcs[$i]; ?>" title="<?= $plainDescriptions[$i]; ?>" width=100 />
+            </a>
+<?        } ?>
+        </div>
       </div>
+      <script>
+        var galleryImg = document.getElementById("gallery-large");
+        var galleryDsc = document.getElementById("gallery-caption");
+        var smallImages = document.getElementById("smalls").getElementsByTagName("a");
+
+        var descs = [<?= '"'.join('", "', array_map(function($s){ return str_replace("\n", " ", addslashes($s)); }, $descriptions)).'"'; ?>];
+
+        for(i = 0; i < smallImages.length; i++){
+          smallImages[i].ord = i;
+          smallImages[i].onclick = function(e){
+            var img = this.getElementsByTagName("img")[0]
+            galleryImg.src = img.src;
+            galleryImg.attributes['title'] = img.attributes['title'];
+            galleryDsc.innerHTML = descs[this.ord];
+            e.preventDefault();
+            return false;
+          }
+        }
+      </script>
 <?  }
   }
 }

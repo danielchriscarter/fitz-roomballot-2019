@@ -136,6 +136,10 @@ class Content {
           <div class='container'><a href='/groups'>⇦ Group Ballot Home</a></div>
 <?      }
 
+        if(Environment::db_read_only){
+          Groups::HTMLwarning("The group ballot is currently read only. You will not be able to make any changes.");
+        }
+
         if(isset($_GET['join'])){
           if(isset($_GET['id'])){
             try{
