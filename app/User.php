@@ -68,21 +68,20 @@ class User {
 			if(!$insertSuccess){
 				throw new Exception("Error adding user to database.");
 			}
-
-			// Create a new individual group for this user
-			$newGroup = Group::createGroup($this->data['name'], $this, true);
-
-			if(!$this->moveToGroup($newGroup)){
-				throw new Exception("Error moving new user to individual group.");
-			}
 		}
 
 		// Initialise groups
-		if($this->data['groupid'] != null){
+		if ($this->data['groupid'] != null) {
 			$this->group = new Group($this->data['groupid']);
+		} else {
+			//Construct a new individual group for this user
+			$newGroup = Group::createGroup($this->data['name'], $this, true);
+			if(!$this->moveToGroup($newGroup)){
+				Group::deleteGroup($newGroup);
+				throw new Exception("Error moving new user to individual group.");
+			}
 		}
-
-		if($this->data['requesting'] != null){
+		if ($this->data['requesting'] != null) {
 			$this->requestingGroup = new Group($this->data['requesting']);
 		}
 	}
