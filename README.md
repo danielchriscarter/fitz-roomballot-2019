@@ -19,7 +19,7 @@ Installation
 Contributing
 ----
 
-You are cordially invited to contribute to this project! If you discover a bug please submit an issue through GitHub. If you think this is something you can fix yourself then please fork and submit a merge request. If you discover a serious security issue or vulnerability please send a PGP-encrypted message to Charlie using keyid `22707ACC`.
+You are cordially invited to contribute to this project! Please see [Code of Conduct](https://github.com/CHTJonas/roomballot/blob/master/CODE_OF_CONDUCT.md) and [Contributing](https://github.com/CHTJonas/roomballot/blob/master/CONTRIBUTING.md) for more information.
 
 License & Legal
 ----
