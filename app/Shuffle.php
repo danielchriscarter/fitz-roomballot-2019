@@ -11,10 +11,12 @@ class Shuffle {
 	private function __clone() {}
 	private function __sleep() {}
 	private function __wakeup() {}
-	public static function getInstance() {
+	public static function getInstance($seed = null) {
 		if (!isset(self::$instance)) {
-			$seed = self::getSeed();
-			$seed = $seed * self::getSeed();
+      if($seed == null){
+        $seed = self::fetchSeed();
+        $seed = $seed * self::fetchSeed();
+      }
 			self::$instance = new Shuffle($seed);
 		}
 		return self::$instance;
@@ -22,7 +24,7 @@ class Shuffle {
 
 	public function shuffle($groups) {
 		mt_srand($this->seededValue);
-		// https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
+		//https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
 		$n = count($groups)-1;
 		for ($i = 0; $i <  $n - 2; $i++) {
 			$j = mt_rand($i, $n);
@@ -35,7 +37,11 @@ class Shuffle {
 			"seed" => $this->seededValue);
 	}
 
-	private static function getSeed() {
+  public function getSeed(){
+    return $this->seededValue;
+  }
+
+	private static function fetchSeed() {
 		$session = curl_init("https://www.random.org/integers/?num=1&min=100000000&max=1000000000&col=5&base=10&format=plain&rnd=new");
 		curl_setopt($session, CURLOPT_HTTPGET, true);
 		curl_setopt($session, CURLOPT_RETURNTRANSFER, true);

@@ -164,39 +164,74 @@ class Content {
 
           echo "<br />Done!";
         }else if($_GET["action"] == "ballot"){
-          //Get second-year owned groups
-          $secondYears = Database::getInstance()->query(
-            "SELECT `ballot_groups`.`id` FROM `ballot_groups`
-             JOIN `ballot_individuals` ON `ballot_groups`.`owner`=`ballot_individuals`.`id`
-             WHERE `priority`='SECONDYEAR'");
-          $groups = [];
-          while($row = $secondYears->fetch_assoc()){
-            $groups[] = new Group($row['id']);
-          }
+          $ballotPriorities = ["SCHOLAR%", "SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
+          $prettyNames = [
+            "SCHOLAR%" => "Scholars' Individual Ballot",
+            "SECONDYEAR" => "Second Years'",
+            "THIRDYEAR" => "Third Years' With Confirmed Fourth",
+            "FIRSTYEAR" => "First Years'"
+          ]; 
+          $scholarGroup = [
+            "SECONDYEAR" => "SCHOLARSECOND",
+            "THIRDYEAR" => "SCHOLARTHIRD",
+            "FIRSTYEAR" => "FIRSTYEAR"
+          ];
+          ?>
 
-          $ballotOrder = Shuffle::getInstance()->shuffle($groups);
-          echo "<b>Seed: ".$ballotOrder["seed"]."</b><br />"; ?>
-          
           <table class="table table-condensed table-bordered table-hover">
             <thead>
               <tr>
+                <td>Ballot Position</td>
                 <td>Group ID</td>
-                <td>Group Name</td>
-                <td>Group Owner</td>
                 <td>Group Members</td>
               </tr>
             </thead>
 
-<?        foreach($ballotOrder["groups"] as $group){ ?>
-            <tr>
-              <td><?= $group->getID(); ?></td>
-              <td><?= $group->getName(); ?></td>
-              <td><?= $group->getOwnerName(); ?> (<?= $group->getOwnerCRSID(); ?>)</td>
-              <td><?= join(", ", array_map(function($member){
-                return $member['name']." (".$member['crsid'].")";
-              }, $group->getMemberList())); ?></td>
-            </tr>
-<?        } ?>
+<?        $ballotPosition = 1;
+
+          if(isset($_GET['seed'])){
+            $shuffler = Shuffle::getInstance(intval($_GET['seed']));
+          }else{
+            $shuffler = Shuffle::getInstance();
+          }
+          echo "<b>Seed: ".$shuffler->getSeed()."</b><br />";
+
+          foreach($ballotPriorities as $ballotPriority){ ?>
+            <tr><td colspan="3"><h3><?= $prettyNames[$ballotPriority]; ?></h3></td></tr>
+<?          //Get second-year owned groups
+            if($ballotPriority == "SCHOLAR%"){
+              $query = "SELECT `ballot_groups`.`id` FROM `ballot_groups`
+                        JOIN `ballot_individuals` ON `ballot_groups`.`owner`=`ballot_individuals`.`id`
+                        WHERE `priority` LIKE '$ballotPriority'
+                        AND (`individual`=1 OR `size`=1)
+                        ORDER BY `ballot_groups`.`id`";
+              
+            }else{
+              $query = "SELECT `ballot_groups`.`id` FROM `ballot_groups`
+                        JOIN `ballot_individuals` ON `ballot_groups`.`owner`=`ballot_individuals`.`id`
+                        WHERE `priority` LIKE '$ballotPriority'
+                        OR (`priority`='".$scholarGroup[$ballotPriority]."' AND `individual`=0)
+                        ORDER BY `ballot_groups`.`id`";
+            }
+
+            $groupIDs = Database::getInstance()->query($query);
+
+            $groups = [];
+            while($row = $groupIDs->fetch_assoc()){
+              $groups[] = new Group($row['id']);
+            }
+
+            $ballotOrder = $shuffler->shuffle($groups);
+            foreach($ballotOrder["groups"] as $group){ ?>
+              <tr>
+                <td><?= $ballotPosition++; ?></td>
+                <td><?= $group->getID(); ?></td>
+                <td><?= join("<br />", array_map(function($member){
+                  return $member['name']." (".$member['crsid'].")";
+                }, $group->getMemberList())); ?></td>
+              </tr>
+<?          }
+          } ?>
           </table>
 <?      }
       }else{ ?>
