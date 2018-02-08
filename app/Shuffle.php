@@ -6,7 +6,7 @@ class Shuffle {
 	private static $instance;
 	private $seededValue;
 	private function __construct($seed) {
-		$seededValue = $seed;
+		$this->seededValue = $seed;
 	}
 	private function __clone() {}
 	private function __sleep() {}
@@ -32,7 +32,7 @@ class Shuffle {
 		}
 		return array(
 			"groups" => $groups,
-			"seed" => $seededValue);
+			"seed" => $this->seededValue);
 	}
 
 	private static function getSeed() {
