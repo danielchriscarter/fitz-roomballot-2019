@@ -135,10 +135,10 @@ class Database {
 	  $this->query("START TRANSACTION");
 
 	  foreach($queries as $q){
-		if( !$this->query($q) ){
-		  $this->query("ROLLBACK");
-		  return false;
-		}
+      if( !$this->query($q) ){
+        $this->query("ROLLBACK");
+        return false;
+      }
 	  }
 
 	  $this->query("COMMIT");

@@ -77,30 +77,49 @@ class Content {
 
   private static function rooms($room = true){
     if(isset($_GET['url'])){
-    $db = Database::getInstance();
-    $roomname = $db->escape($_GET['url']);
+      $db = Database::getInstance();
+      $roomname = $db->escape($_GET['url']);
 
-    $roomQuery = "SELECT * FROM `rooms` WHERE `url`='$roomname'";
-    $imageQuery = "SELECT *, `room_images`.`description` as `description` FROM `room_images`
-             JOIN `rooms` on `roomid`=`rooms`.`id`
-             WHERE `rooms`.`url`='$roomname'";
-    $quoteQuery = "SELECT * FROM `room_quotes`
-             JOIN `rooms` on `roomid`=`rooms`.`id`
-             WHERE `rooms`.`url`='$roomname'";
+      $roomQuery = "SELECT * FROM `rooms` WHERE `url`='$roomname'";
+      $imageQuery = "SELECT *, `room_images`.`description` as `description` FROM `room_images`
+               JOIN `rooms` on `roomid`=`rooms`.`id`
+               WHERE `rooms`.`url`='$roomname'";
+      $quoteQuery = "SELECT * FROM `room_quotes`
+               JOIN `rooms` on `roomid`=`rooms`.`id`
+               WHERE `rooms`.`url`='$roomname'";
 
-    $roomResult = $db->query($roomQuery);
-    if($roomResult->num_rows > 0){
-      $room = $roomResult->fetch_assoc();
-      $imageResult = $db->query($imageQuery);
-      $quoteResult = $db->query($quoteQuery);
+      $roomResult = $db->query($roomQuery);
+      if($roomResult->num_rows > 0){
+        $room = $roomResult->fetch_assoc();
+        $imageResult = $db->query($imageQuery);
+        $quoteResult = $db->query($quoteQuery);
 
-      Rooms::HTMLroomView($room, $imageResult, $quoteResult);
-    }
+        Rooms::HTMLroomView($room, $imageResult, $quoteResult);
+      }
     }else{
-    //Display a picker for rooms / houses
-    if($room){
-      Rooms::HTMLroomSelector();
-    }
+      //Display a picker for rooms / houses
+      if($room){
+        Rooms::HTMLroomSelector();
+      }else{
+        $houses = Database::getInstance()->fetch("rooms", "`house`=1", "`maxsize`"); 
+        ?>
+        <div class="container">
+        <table class="table table-condensed table-bordered table-hover">
+          <thead>
+            <tr>
+              <td>House Address</td>
+              <td>Size</td>
+            </tr>
+          </thead>
+<?        foreach($houses as $house){ ?>
+            <tr>
+              <td><a href='/houses/<?= $house['url']; ?>'><?= $house['name']; ?></a></td>
+              <td><?= $house['maxsize']; ?></td>
+            </tr>
+<?        } ?>
+        </table>
+        </div>
+<?    }
     }
   }
 
