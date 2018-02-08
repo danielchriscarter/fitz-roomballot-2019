@@ -140,6 +140,7 @@ class Groups {
 
     <input type="submit" value="Create Group" />
     <br /><br />
+    Group names will not be visible on the final ballot.<br />
     Note: rude or inappropriate group names may be subject to disciplinary action.
     </form>
 <?
