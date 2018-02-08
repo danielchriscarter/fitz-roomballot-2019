@@ -1,4 +1,6 @@
 # Fitz JCR Housing Ballot System
+[![Maintainability](https://api.codeclimate.com/v1/badges/d9809cce796fad2fc9cf/maintainability)](https://codeclimate.com/github/CHTJonas/roomballot/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/d9809cce796fad2fc9cf/test_coverage)](https://codeclimate.com/github/CHTJonas/roomballot/test_coverage)
 This is the code repository for Fitzwilliam College JCR's online Room & Housing Ballot System. It is currently a work in progress and we do not have an estimated project release date.
 
 The app itself is written in PHP and is designed to run on the SRCF's web server, but in theory it should be easily deployed elsewhere too. The authentication uses the `$_SERVER['REMOTE_USER']` PHP variable and is designed to work seamlessly with the Raven single sign-on service at the University of Cambridge, however it should be easily adaptable to any other kind of authentication backend.
