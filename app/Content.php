@@ -11,6 +11,7 @@ require_once "Groups.php";
 require_once "Rooms.php";
 require_once "Group.php";
 require_once "User.php";
+require_once "BallotMaker.php";
 require_once "Shuffle.php";
 
 class Content {
@@ -31,6 +32,9 @@ class Content {
                 break;
             case "houses":
                 Content::rooms(false);
+                break;
+            case "order":
+                Content::order();
                 break;
             case "admin":
                 Content::admin();
@@ -100,6 +104,17 @@ class Content {
       }
     }
 
+    private static function order(){
+      $result = Database::getInstance()->query("SELECT `seed` FROM `ballot_seed` WHERE `id`=0");
+      if($result->num_rows > 0){ ?>
+        <div class="container">
+          <?= BallotMaker::makeBallot(); ?>
+        </div>
+<?    }else{
+        Groups::HTMLerror("The ballot has not been drawn yet. See <a href='/timetable'>the Ballot Timetable</a> for when this will happen.");
+      }
+    }
+
     private static function admin(){
       $user = new User();
       if($user->getCRSID() != Environment::admin_crsid){
@@ -164,76 +179,22 @@ class Content {
 
           echo "<br />Done!";
         }else if($_GET["action"] == "ballot"){
-          $ballotPriorities = ["SCHOLAR%", "SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
-          $prettyNames = [
-            "SCHOLAR%" => "Scholars' Individual Ballot",
-            "SECONDYEAR" => "Second Years'",
-            "THIRDYEAR" => "Third Years' With Confirmed Fourth",
-            "FIRSTYEAR" => "First Years'"
-          ]; 
-          $scholarGroup = [
-            "SECONDYEAR" => "SCHOLARSECOND",
-            "THIRDYEAR" => "SCHOLARTHIRD",
-            "FIRSTYEAR" => "FIRSTYEAR"
-          ];
-          ?>
-
-          <table class="table table-condensed table-bordered table-hover">
-            <thead>
-              <tr>
-                <td>Ballot Position</td>
-                <td>Group ID</td>
-                <td>Group Members</td>
-              </tr>
-            </thead>
-
-<?        $ballotPosition = 1;
-
           if(isset($_GET['seed'])){
-            $shuffler = Shuffle::getInstance(intval($_GET['seed']));
+            $seed = intval($_GET['seed']);
+            if(isset($_GET['final'])){
+              //Force-write seed to database - if it already exists, INSERT will fail
+              $result = Database::getInstance()->query("INSERT INTO `ballot_seed` (`id`, `seed`) VALUES (0, $seed)", true);
+              BallotMaker::makeBallot();
+            }else{
+              BallotMaker::makeBallot($seed); //Simulate ballot
+            }
           }else{
             $shuffler = Shuffle::getInstance();
+            echo "<h1>Seed: ".$shuffler->getSeed()."</h1>";
+            echo "<a href='/admin?action=ballot&seed=".$shuffler->getSeed()."'>Run Mock Ballot</a><br />";
+            echo "<b><a href='/admin?action=ballot&seed=".$shuffler->getSeed()."&final'>Run Final Ballot</a></b>";
           }
-          echo "<b>Seed: ".$shuffler->getSeed()."</b><br />";
-
-          foreach($ballotPriorities as $ballotPriority){ ?>
-            <tr><td colspan="3"><h3><?= $prettyNames[$ballotPriority]; ?></h3></td></tr>
-<?          //Get second-year owned groups
-            if($ballotPriority == "SCHOLAR%"){
-              $query = "SELECT `ballot_groups`.`id` FROM `ballot_groups`
-                        JOIN `ballot_individuals` ON `ballot_groups`.`owner`=`ballot_individuals`.`id`
-                        WHERE `priority` LIKE '$ballotPriority'
-                        AND (`individual`=1 OR `size`=1)
-                        ORDER BY `ballot_groups`.`id`";
-              
-            }else{
-              $query = "SELECT `ballot_groups`.`id` FROM `ballot_groups`
-                        JOIN `ballot_individuals` ON `ballot_groups`.`owner`=`ballot_individuals`.`id`
-                        WHERE `priority` LIKE '$ballotPriority'
-                        OR (`priority`='".$scholarGroup[$ballotPriority]."' AND `individual`=0)
-                        ORDER BY `ballot_groups`.`id`";
-            }
-
-            $groupIDs = Database::getInstance()->query($query);
-
-            $groups = [];
-            while($row = $groupIDs->fetch_assoc()){
-              $groups[] = new Group($row['id']);
-            }
-
-            $ballotOrder = $shuffler->shuffle($groups);
-            foreach($ballotOrder["groups"] as $group){ ?>
-              <tr>
-                <td><?= $ballotPosition++; ?></td>
-                <td><?= $group->getID(); ?></td>
-                <td><?= join("<br />", array_map(function($member){
-                  return $member['name']." (".$member['crsid'].")";
-                }, $group->getMemberList())); ?></td>
-              </tr>
-<?          }
-          } ?>
-          </table>
-<?      }
+        }
       }else{ ?>
         <a href="?action=dbfix">Check and fix DB (null groups, incorrect counts)</a><br />
         <a href="?action=ballot">Perform a (simulation) ballot</a>

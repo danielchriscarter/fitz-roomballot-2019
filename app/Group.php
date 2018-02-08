@@ -139,7 +139,8 @@ class Group {
               FROM `ballot_groups`
               JOIN `ballot_individuals`
               ON `groupid`=`ballot_groups`.`id` 
-              WHERE `ballot_groups`.`id`='".$this->getID()."'";
+              WHERE `ballot_groups`.`id`='".$this->getID()."'
+              ORDER BY `name`";
     $result = Database::getInstance()->query($query);
     $rows = [];
     while($row = $result->fetch_assoc()){
@@ -153,7 +154,8 @@ class Group {
               FROM `ballot_groups`
               JOIN `ballot_individuals`
               ON `requesting`=`ballot_groups`.`id` 
-              WHERE `ballot_groups`.`id`='".$this->getID()."'"; 
+              WHERE `ballot_groups`.`id`='".$this->getID()."'
+              ORDER BY `name`"; 
     $result = Database::getInstance()->query($query);
     $rows = []; 
     while($row = $result->fetch_assoc()){
