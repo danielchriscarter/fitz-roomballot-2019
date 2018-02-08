@@ -16,7 +16,7 @@ priority = {
   "3": "THIRDYEAR"
 }
 
-with open("ballot.csv", "rb") as csvfile:
+with open(args.file[0], "rb") as csvfile:
   csvreader = csv.DictReader(csvfile, delimiter=",",quotechar='"')
   if args.authgroup:
     values = []
