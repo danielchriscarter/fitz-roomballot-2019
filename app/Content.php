@@ -16,30 +16,29 @@ require_once "Shuffle.php";
 
 class Content {
 
-    public static function makeContent($url) {
-        switch ($url) {
-            case "news":
-                Content::news();
-                break;
-            case "timetable":
-                Content::timetable();
-                break;
-            case "groups":
-                Content::groups();
-                break;
-            case "rooms":
-                Content::rooms(true);
-                break;
-            case "houses":
-                Content::rooms(false);
-                break;
-            case "order":
-                Content::order();
-                break;
-            case "admin":
-                Content::admin();
-                break;
-        }
+  public static function makeContent($url) {
+    switch ($url) {
+        case "news":
+            Content::news();
+            break;
+        case "timetable":
+            Content::timetable();
+            break;
+        case "groups":
+            Content::groups();
+            break;
+        case "rooms":
+            Content::rooms(true);
+            break;
+        case "houses":
+            Content::rooms(false);
+            break;
+        case "order":
+            Content::order();
+            break;
+        case "admin":
+            Content::admin();
+            break;
     }
   }
 
@@ -105,162 +104,100 @@ class Content {
     }
   }
 
+  private static function order(){
+    $result = Database::getInstance()->query("SELECT `seed` FROM `ballot_seed` WHERE `id`=0");
+    if($result->num_rows > 0){ ?>
+      <div class="container">
+        <?= BallotMaker::makeBallot(); ?>
+      </div>
+<?  }else{
+      Groups::HTMLerror("The ballot has not been drawn yet. See <a href='/timetable'>the Ballot Timetable</a> for when this will happen.");
+    }
+  }
+
   private static function admin(){
     $user = new User();
     if($user->getCRSID() != Environment::admin_crsid){
-    Groups::HTMLerror("You do not have admin permission");
-    return;
+      Groups::HTMLerror("You do not have admin permission");
+      return;
     } ?>
     <div class="container">      
 <?
     //Generate groups for every user
 
     if(isset($_GET["action"])){
-    if($_GET["action"] == "dbfix"){
-      $query = "SELECT * FROM `ballot_individuals` WHERE `groupid` IS NULL";
-      $result = Database::getInstance()->query($query);
+      if($_GET["action"] == "dbfix"){
+        $query = "SELECT * FROM `ballot_individuals` WHERE `groupid` IS NULL";
+        $result = Database::getInstance()->query($query);
 
-      echo "Generating ".$result->num_rows." individual groups...<br />"; 
-      $success = 0;
-      while($row = $result->fetch_assoc()){
-      //creating the user is enough to create a group
-      try{
-        $user = new User($row['id']);
-        $success += 1;
-      }catch(Exception $e){
-        echo "Error: ".$e->getMessage()."<br />\n";
-        var_dump($row);
-        echo "\n";
-      }
-      }
-
-      echo "Generated $success groups<br />";
-
-      $query = "SELECT `ballot_groups`.`id` as `id`, `size`, `actual` FROM `ballot_groups`
-          LEFT JOIN (
-            SELECT `groupid`, count(*) as `actual` FROM `ballot_individuals`
-            GROUP BY `groupid`
-          ) `groupcounts` ON `groupid`=`ballot_groups`.`id`
-          WHERE `actual`  != `size`
-          OR `actual` IS NULL";
-      $result = Database::getInstance()->query($query);
-
-      echo "<br />";
-      echo "Found ".$result->num_rows." miscounted group sizes...<br />";
-      while($row = $result->fetch_assoc()){
-      $id = intval($row['id']);
-      $actualSize = intval($row['actual']);
-      $size = intval($row['size']);
-
-      echo "$id has $actualSize members, not $size.<br />";
-
-      if($actualSize == 0){
-        Group::deleteGroup(new Group($id));
-        echo "Deleted it<br />";
-      }else if($actualSize > Group::maxSize()){
-        echo "<b>Take manual action</b><br />";
-      }else{
-        $res = Database::getInstance()->query("UPDATE `ballot_groups` SET `size`='$actualSize' WHERE `id`='$id'");
-        if($res){
-        echo "Reset counter to $actualSize<br />";
+        echo "Generating ".$result->num_rows." individual groups...<br />"; 
+        $success = 0;
+        while($row = $result->fetch_assoc()){
+          //creating the user is enough to create a group
+          try{
+            $user = new User($row['id']);
+            $success += 1;
+          }catch(Exception $e){
+            echo "Error: ".$e->getMessage()."<br />\n";
+            var_dump($row);
+            echo "\n";
+          }
         }
-      }
-    }
 
-    private static function order(){
-      $result = Database::getInstance()->query("SELECT `seed` FROM `ballot_seed` WHERE `id`=0");
-      if($result->num_rows > 0){ ?>
-        <div class="container">
-          <?= BallotMaker::makeBallot(); ?>
-        </div>
-<?    }else{
-        Groups::HTMLerror("The ballot has not been drawn yet. See <a href='/timetable'>the Ballot Timetable</a> for when this will happen.");
-      }
-    }
+        echo "Generated $success groups<br />";
 
-    private static function admin(){
-      $user = new User();
-      if($user->getCRSID() != Environment::admin_crsid){
-        Groups::HTMLerror("You do not have admin permission");
-        return;
-      } ?>
-      <div class="container">      
-<?
-      //Generate groups for every user
+        $query = "SELECT `ballot_groups`.`id` as `id`, `size`, `actual` FROM `ballot_groups`
+                  LEFT JOIN (
+                    SELECT `groupid`, count(*) as `actual` FROM `ballot_individuals`
+                    GROUP BY `groupid`
+                  ) `groupcounts` ON `groupid`=`ballot_groups`.`id`
+                  WHERE `actual`  != `size`
+                  OR `actual` IS NULL";
+        $result = Database::getInstance()->query($query);
 
-      if(isset($_GET["action"])){
-        if($_GET["action"] == "dbfix"){
-          $query = "SELECT * FROM `ballot_individuals` WHERE `groupid` IS NULL";
-          $result = Database::getInstance()->query($query);
+        echo "<br />";
+        echo "Found ".$result->num_rows." miscounted group sizes...<br />";
+        while($row = $result->fetch_assoc()){
+          $id = intval($row['id']);
+          $actualSize = intval($row['actual']);
+          $size = intval($row['size']);
 
-          echo "Generating ".$result->num_rows." individual groups...<br />"; 
-          $success = 0;
-          while($row = $result->fetch_assoc()){
-            //creating the user is enough to create a group
-            try{
-              $user = new User($row['id']);
-              $success += 1;
-            }catch(Exception $e){
-              echo "Error: ".$e->getMessage()."<br />\n";
-              var_dump($row);
-              echo "\n";
-            }
-          }
+          echo "$id has $actualSize members, not $size.<br />";
 
-          echo "Generated $success groups<br />";
-
-          $query = "SELECT `ballot_groups`.`id` as `id`, `size`, `actual` FROM `ballot_groups`
-                    LEFT JOIN (
-                      SELECT `groupid`, count(*) as `actual` FROM `ballot_individuals`
-                      GROUP BY `groupid`
-                    ) `groupcounts` ON `groupid`=`ballot_groups`.`id`
-                    WHERE `actual`  != `size`
-                    OR `actual` IS NULL";
-          $result = Database::getInstance()->query($query);
-
-          echo "<br />";
-          echo "Found ".$result->num_rows." miscounted group sizes...<br />";
-          while($row = $result->fetch_assoc()){
-            $id = intval($row['id']);
-            $actualSize = intval($row['actual']);
-            $size = intval($row['size']);
-
-            echo "$id has $actualSize members, not $size.<br />";
-
-            if($actualSize == 0){
-              Group::deleteGroup(new Group($id));
-              echo "Deleted it<br />";
-            }else if($actualSize > Group::maxSize()){
-              echo "<b>Take manual action</b><br />";
-            }else{
-              $res = Database::getInstance()->query("UPDATE `ballot_groups` SET `size`='$actualSize' WHERE `id`='$id'");
-              if($res){
-                echo "Reset counter to $actualSize<br />";
-              }
-            }
-          }
-
-          echo "<br />Done!";
-        }else if($_GET["action"] == "ballot"){
-          if(isset($_GET['seed'])){
-            $seed = intval($_GET['seed']);
-            if(isset($_GET['final'])){
-              //Force-write seed to database - if it already exists, INSERT will fail
-              $result = Database::getInstance()->query("INSERT INTO `ballot_seed` (`id`, `seed`) VALUES (0, $seed)", true);
-              BallotMaker::makeBallot();
-            }else{
-              BallotMaker::makeBallot($seed); //Simulate ballot
-            }
+          if($actualSize == 0){
+            Group::deleteGroup(new Group($id));
+            echo "Deleted it<br />";
+          }else if($actualSize > Group::maxSize()){
+            echo "<b>Take manual action</b><br />";
           }else{
-            $shuffler = Shuffle::getInstance();
-            echo "<h1>Seed: ".$shuffler->getSeed()."</h1>";
-            echo "<a href='/admin?action=ballot&seed=".$shuffler->getSeed()."'>Run Mock Ballot</a><br />";
-            echo "<b><a href='/admin?action=ballot&seed=".$shuffler->getSeed()."&final'>Run Final Ballot</a></b>";
+            $res = Database::getInstance()->query("UPDATE `ballot_groups` SET `size`='$actualSize' WHERE `id`='$id'");
+            if($res){
+              echo "Reset counter to $actualSize<br />";
+            }
           }
         }
-      }else{ ?>
-        <a href="?action=dbfix">Check and fix DB (null groups, incorrect counts)</a><br />
-        <a href="?action=ballot">Perform a (simulation) ballot</a>
+
+        echo "<br />Done!";
+      }else if($_GET["action"] == "ballot"){
+        if(isset($_GET['seed'])){
+          $seed = intval($_GET['seed']);
+          if(isset($_GET['final'])){
+            //Force-write seed to database - if it already exists, INSERT will fail
+            $result = Database::getInstance()->query("INSERT INTO `ballot_seed` (`id`, `seed`) VALUES (0, $seed)", true);
+            BallotMaker::makeBallot();
+          }else{
+            BallotMaker::makeBallot($seed); //Simulate ballot
+          }
+        }else{
+          $shuffler = Shuffle::getInstance();
+          echo "<h1>Seed: ".$shuffler->getSeed()."</h1>";
+          echo "<a href='/admin?action=ballot&seed=".$shuffler->getSeed()."'>Run Mock Ballot</a><br />";
+          echo "<b><a href='/admin?action=ballot&seed=".$shuffler->getSeed()."&final'>Run Final Ballot</a></b>";
+        }
+      }
+    }else{ ?>
+      <a href="?action=dbfix">Check and fix DB (null groups, incorrect counts)</a><br />
+      <a href="?action=ballot">Perform a (simulation) ballot</a>
 <?    }
 
 ?>
