@@ -102,28 +102,74 @@ class Content {
     private static function admin(){
       $user = new User();
       if($user->getCRSID() != Environment::admin_crsid){
-        echo "You do not have admin permission";
+        Groups::HTMLerror("You do not have admin permission");
         return;
-      }
-
+      } ?>
+      <div class="container">      
+<?
       //Generate groups for every user
-      $query = "SELECT * FROM `ballot_individuals` WHERE `groupid` IS NULL";
-      $result = Database::getInstance()->query($query);
 
-      echo "Generating ".$result->num_rows." individual groups\n"; 
-      $success = 0;
-      while($row = $result->fetch_assoc()){
-        //creating the user is enough to create a group
-        try{
-          $user = new User($row['id']);
-          $success += 1;
-        }catch(Exception $e){
-          echo "Error: ".$e->getMessage()."\n";
-          var_dump($row);
+      if(isset($_GET["action"])){
+        if($_GET["action"] == "dbfix"){
+          $query = "SELECT * FROM `ballot_individuals` WHERE `groupid` IS NULL";
+          $result = Database::getInstance()->query($query);
+
+          echo "Generating ".$result->num_rows." individual groups...<br />"; 
+          $success = 0;
+          while($row = $result->fetch_assoc()){
+            //creating the user is enough to create a group
+            try{
+              $user = new User($row['id']);
+              $success += 1;
+            }catch(Exception $e){
+              echo "Error: ".$e->getMessage()."<br />\n";
+              var_dump($row);
+              echo "\n";
+            }
+          }
+
+          echo "Generated $success groups<br />";
+
+          $query = "SELECT `ballot_groups`.`id` as `id`, `size`, `actual` FROM `ballot_groups`
+                    LEFT JOIN (
+                      SELECT `groupid`, count(*) as `actual` FROM `ballot_individuals`
+                      GROUP BY `groupid`
+                    ) `groupcounts` ON `groupid`=`ballot_groups`.`id`
+                    WHERE `actual`  != `size`
+                    OR `actual` IS NULL";
+          $result = Database::getInstance()->query($query);
+
+          echo "<br />";
+          echo "Found ".$result->num_rows." miscounted group sizes...<br />";
+          while($row = $result->fetch_assoc()){
+            $id = intval($row['id']);
+            $actualSize = intval($row['actual']);
+            $size = intval($row['size']);
+
+            echo "$id has $actualSize members, not $size.<br />";
+
+            if($actualSize == 0){
+              //Group::deleteGroup(new Group($id));
+              echo "Deleted it<br />";
+            }else if($actualSize > Group::maxSize()){
+              echo "<b>Take manual action</b><br />";
+            }else{
+              $res = Database::getInstance()->query("UPDATE `ballot_groups` SET `size`='$actualSize' WHERE `id`='$id'");
+              if($res){
+                echo "Reset counter to $actualSize<br />";
+              }
+            }
+          }
+
+          echo "<br />Done!";
         }
-      }
+      }else{ ?>
+        <a href="?action=dbfix">Check and fix DB (null groups, incorrect counts)</a>       
+<?    }
 
-      echo "Generated $success groups\n";
+?>
+      </div>
+<?
     }
 
     private static function groups(){
