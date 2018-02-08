@@ -21,14 +21,14 @@ class Shuffle {
 	}
 
 	public function shuffle($groups) {
-		mt_srand($seededValue);
+		mt_srand($this->seededValue);
 		// https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
-		n = count($groups);
-		for ($i = 0; $i <  n - 2; $i++) {
-			$j = mt_rand(i, n);
-			$temp = $groups[i];
-			$groups[i] = $groups[j];
-			$groups[j] = $temp;
+		$n = count($groups)-1;
+		for ($i = 0; $i <  $n - 2; $i++) {
+			$j = mt_rand($i, $n);
+			$temp = $groups[$i];
+			$groups[$i] = $groups[$j];
+			$groups[$j] = $temp;
 		}
 		return array(
 			"groups" => $groups,

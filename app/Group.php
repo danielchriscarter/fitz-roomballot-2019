@@ -16,7 +16,10 @@ class Group {
   public function __construct($id){
     //Get DB info from id supplied
     $id = intval($id);
-    $query = "SELECT `ballot_groups`.`id` as `id`, `ballot_groups`.`name` as `name`, `owner`, `public`, `individual`, `size`, `crsid`,`priority` FROM ballot_groups
+    $query = "SELECT `ballot_groups`.`id` as `id`, `ballot_groups`.`name` as `name`, 
+                     `owner`, `public`, `individual`, `size`, `crsid`,`priority`,
+                     `ballot_individuals`.`name` as `ownername` 
+              FROM ballot_groups
               JOIN `ballot_individuals` ON `owner`=`ballot_individuals`.`id`
               WHERE `ballot_groups`.`id`='$id'";
     $result = Database::getInstance()->query($query);
@@ -113,6 +116,10 @@ class Group {
 
   public function getOwnerCRSID(){
     return $this->data['crsid'];
+  }
+
+  public function getOwnerName(){
+    return $this->data['ownername'];
   }
   
   public function getURL(){
