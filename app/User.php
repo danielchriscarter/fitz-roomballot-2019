@@ -108,7 +108,9 @@ class User {
         return "'SCHOLARSECOND','SECONDYEAR'";
       case "SCHOLARTHIRD":
       case "THIRDYEAR":
-        return "'SCHOLARTHIRD','THIRDYEAR'";
+        return "'SCHOLARTHIRD','THIRDYEAR', 'THIRDYEARABROAD'";
+      case "THIRDYEARABROAD":
+        return "'SCHOLARTHIRD','THIRDYEAR','SECONDYEAR'"; //Third years abroad can ballot with second years
       case "FIRSTYEAR":
         return "'FIRSTYEAR'";
       default:
@@ -186,7 +188,13 @@ class User {
   public function canJoin($group){
     // Returns whether the user can join a group
     if ($this->getGroup() != $group && $group->getSize() < Group::maxSize()) {
-      return $this->getBallotPriority() == $group->getBallotPriority();
+      return $this->getBallotPriority() == $group->getBallotPriority()
+          //Allow third years abroad to ballot with both 2nd and 3rd years
+          || ($this->getBallotPriority() == Group::THIRDYEARABROAD && (
+               $group->getBallotPriority() == Group::SECONDYEAR
+            || $group->getBallotPriority() == Group::THIRDYEAR
+            )
+          );
     }
   }
 

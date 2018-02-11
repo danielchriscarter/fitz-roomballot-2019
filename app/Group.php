@@ -8,8 +8,9 @@ class Group {
   const SCHOLARSECOND = 1;
   const SCHOLARTHIRD = 2;
   const SECONDYEAR = 3;
-  const THIRDYEAR = 3; /* Second years and third years can now ballot together */
-  const FIRSTYEAR = 5;
+  const THIRDYEARABROAD = 4; /* Second years and third years abroad can now ballot together */
+  const THIRDYEAR = 5;
+  const FIRSTYEAR = 6;
 
   private $data;
 
@@ -36,6 +37,8 @@ class Group {
       case "SCHOLARSECOND":
       case "SECONDYEAR":
         return Group::SECONDYEAR;
+      case "THIRDYEARABROAD":
+        return Group::THIRDYEARABROAD;
       case "SCHOLARTHIRD":
       case "THIRDYEAR":
         return Group::THIRDYEAR;
