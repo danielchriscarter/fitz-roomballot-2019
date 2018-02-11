@@ -108,9 +108,10 @@ class User {
         return "'SCHOLARSECOND','SECONDYEAR'";
       case "SCHOLARTHIRD":
       case "THIRDYEAR":
-        return "'SCHOLARTHIRD','THIRDYEAR', 'THIRDYEARABROAD'";
+        return "'SCHOLARTHIRD','THIRDYEAR', 'THIRDYEARABROAD', 'SCHOLARTHIRDABROAD'";
+      case "SCHOLARTHIRDABROAD":
       case "THIRDYEARABROAD":
-        return "'SCHOLARTHIRD','THIRDYEAR','SECONDYEAR'"; //Third years abroad can ballot with second years
+        return "'SCHOLARTHIRD','THIRDYEAR','SECONDYEAR', 'SCHOLARTHIRDABROAD'"; //Third years abroad can ballot with second years
       case "FIRSTYEAR":
         return "'FIRSTYEAR'";
       default:
@@ -120,7 +121,7 @@ class User {
 
   public function isScholar() {
     // Returns whether this user is a scholar.
-    return $this->data['priority'] == "SCHOLARSECOND" || $this->data['priority'] == "SCHOLARTHIRD";
+    return $this->data['priority'] == "SCHOLARSECOND" || $this->data['priority'] == "SCHOLARTHIRD" || $this->data['priority'] == "SCHOLARTHIRDABROAD";
   }
 
   //

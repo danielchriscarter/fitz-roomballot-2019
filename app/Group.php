@@ -7,10 +7,11 @@ require_once "Database.php";
 class Group {
   const SCHOLARSECOND = 1;
   const SCHOLARTHIRD = 2;
-  const SECONDYEAR = 3;
-  const THIRDYEARABROAD = 4; /* Second years and third years abroad can now ballot together */
-  const THIRDYEAR = 5;
-  const FIRSTYEAR = 6;
+  const SCHOLARTHIRDABROAD = 3;
+  const SECONDYEAR = 4;
+  const THIRDYEARABROAD = 5; /* Second years and third years abroad can now ballot together */
+  const THIRDYEAR = 6;
+  const FIRSTYEAR = 7;
 
   private $data;
 
@@ -37,6 +38,7 @@ class Group {
       case "SCHOLARSECOND":
       case "SECONDYEAR":
         return Group::SECONDYEAR;
+      case "SCHOLARTHIRDABROAD":
       case "THIRDYEARABROAD":
         return Group::THIRDYEARABROAD;
       case "SCHOLARTHIRD":

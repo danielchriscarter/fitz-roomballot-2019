@@ -14,7 +14,7 @@ class BallotMaker{
       ]; 
       $scholarGroup = [
         "SECONDYEAR" => "SCHOLARSECOND",
-        "THIRDYEAR%" => "SCHOLARTHIRD",
+        "THIRDYEAR%" => "SCHOLARTHIRD%",
         "FIRSTYEAR" => "FIRSTYEAR"
       ];
       ?>
@@ -61,7 +61,7 @@ class BallotMaker{
             //Ensure 3rd year groups only appear in the highest ballot they can
             $query .=  "AND `ballot_groups`.`id` NOT IN (SELECT `groupid` FROM `ballot_individuals` WHERE `priority` IN ('SCHOLARSECOND', 'SECONDYEAR')) ";
           }
-          $query .= "OR (`priority`='".$scholarGroup[$ballotPriority]."' AND (`individual`=0 AND `size` > 1))
+          $query .= "OR (`priority` LIKE '".$scholarGroup[$ballotPriority]."' AND (`individual`=0 AND `size` > 1))
                     ORDER BY `ballot_groups`.`id`";
         }
 
