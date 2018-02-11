@@ -4,11 +4,11 @@ require_once("Database.php");
 require_once("Shuffle.php");
 
 class BallotMaker{
-  public static function makeBallot($seed = null){
+  public static function makeBallot($seed = null, $formatCSV = false){
       $ballotPriorities = ["SCHOLAR%", "SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
       $prettyNames = [
         "SCHOLAR%" => "Scholars' Individual Ballot",
-        "SECONDYEAR" => "Second Years'",
+        "SECONDYEAR" => "Groups Containing Second Years'",
         "THIRDYEAR" => "Third Years' With Confirmed Fourth",
         "FIRSTYEAR" => "First Years'"
       ]; 
@@ -56,8 +56,12 @@ class BallotMaker{
         }else{
           $query = "SELECT `ballot_groups`.`id` FROM `ballot_groups`
                     JOIN `ballot_individuals` ON `ballot_groups`.`owner`=`ballot_individuals`.`id`
-                    WHERE `priority` LIKE '$ballotPriority'
-                    OR (`priority`='".$scholarGroup[$ballotPriority]."' AND (`individual`=0 OR `size` > 1))
+                    WHERE `ballot_groups`.`id` IN (SELECT `groupid` FROM `ballot_individuals` WHERE `priority` LIKE '$ballotPriority') ";
+          if($ballotPriority == "THIRDYEAR"){
+            //Ensure 3rd year groups only appear in the highest ballot they can
+            $query .=  "AND `ballot_groups`.`id` NOT IN (SELECT `groupid` FROM `ballot_individuals` WHERE `priority` IN ('SCHOLARSECOND', 'SECONDYEAR')) ";
+          }
+          $query .= "OR (`priority`='".$scholarGroup[$ballotPriority]."' AND (`individual`=0 AND `size` > 1))
                     ORDER BY `ballot_groups`.`id`";
         }
 

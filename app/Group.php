@@ -8,7 +8,7 @@ class Group {
   const SCHOLARSECOND = 1;
   const SCHOLARTHIRD = 2;
   const SECONDYEAR = 3;
-  const THIRDYEAR = 4;
+  const THIRDYEAR = 3; /* Second years and third years can now ballot together */
   const FIRSTYEAR = 5;
 
   private $data;
