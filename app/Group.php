@@ -35,12 +35,12 @@ class Group {
 
   public static function GroupPriority($string){
     switch($string){
+      //Third years abroad are treated like 2nd years
+      case "SCHOLARTHIRDABROAD":
+      case "THIRDYEARABROAD":
       case "SCHOLARSECOND":
       case "SECONDYEAR":
         return Group::SECONDYEAR;
-      case "SCHOLARTHIRDABROAD":
-      case "THIRDYEARABROAD":
-        return Group::THIRDYEARABROAD;
       case "SCHOLARTHIRD":
       case "THIRDYEAR":
         return Group::THIRDYEAR;
