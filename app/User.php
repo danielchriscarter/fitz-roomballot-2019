@@ -47,27 +47,7 @@ class User {
       // User exists in DB
       $this->data = $result->fetch_assoc();
     } else {
-      // Create user in DB with individual group
-      $db = Database::getInstance();
-
-      //Populate data
-      $this->data['id'] = random_int(0, PHP_INT_MAX);
-      $this->data['name'] = $this->crsid;
-      $this->data['searching'] = false;
-      $this->data['groupid'] = null;
-      $this->data['requesting'] = null;
-
-      $insertSuccess = $db->insert("ballot_individuals", [
-        "id"=>$this->data['id'],
-        "name"=>$this->data['name'],
-        "crsid"=>$this->crsid,
-        "groupid"=>$this->data['groupid'],
-        "searching"=>$this->data['searching']
-      ]);
-
-      if(!$insertSuccess){
-        throw new Exception("Error adding user to database.");
-      }
+      throw new Exception("You're not entered in the ballot, and so cannot use the Group Ballot page");
     }
 
     // Initialise groups
