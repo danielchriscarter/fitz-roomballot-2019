@@ -60,6 +60,9 @@ class BallotMaker{
           if($ballotPriority == "SECONDYEAR"){ //Also include third years abroad in here
             $query .= "OR `ballot_groups`.`id` IN (SELECT `groupid` FROM `ballot_individuals` WHERE `priority` LIKE 'THIRDYEARABROAD')
                        OR (`priority` LIKE 'SCHOLARTHIRDABROAD' AND (`individual`=0 AND `size`>1)) ";
+          }else if($ballotPriority == "THIRDYEAR"){
+            //Don't include third years who have been 'pulled up' by third years abroad.
+            $query .= "AND NOT `ballot_groups`.`id` IN (SELECT `groupid` FROM `ballot_individuals` WHERE `priority` IN ('SCHOLARTHIRDABROAD', 'THIRDYEARABROAD')) ";
           }
           $query .=  "OR (`priority` LIKE '".$scholarGroup[$ballotPriority]."' AND (`individual`=0 AND `size` > 1))
                       ORDER BY `ballot_groups`.`id`";

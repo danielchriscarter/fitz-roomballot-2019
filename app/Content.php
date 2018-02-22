@@ -216,7 +216,8 @@ class Content {
       }
     }else{ ?>
       <a href="?action=dbfix">Check and fix DB (null groups, incorrect counts)</a><br />
-      <a href="?action=ballot">Perform a (simulation) ballot</a>
+      <a href="?action=ballot">Perform a ballot (or a mock ballot)</a></br />
+      <a href="/scripts/ballot.csv.php">Get ballot spreadsheet</a>
 <?    }
 
 ?>

@@ -80,7 +80,7 @@ class Rooms {
 
         <div id="large">
           <div class="thumbnail">
-            <a href='<?= $srcs[0] ?>'>
+            <a href='<?= $srcs[0] ?>' id="gallery-link">
               <img id="gallery-large" src="<?= $srcs[0] ?>" title="<?= $plainDescriptions[0] ?>" style="width: 100%;"/>
               <div id="gallery-caption" class="caption">
                 <?= $descriptions[0]; ?>
@@ -98,6 +98,7 @@ class Rooms {
       </div>
       <script>
         var galleryImg = document.getElementById("gallery-large");
+        var galleryLnk = document.getElementById("gallery-link");
         var galleryDsc = document.getElementById("gallery-caption");
         var smallImages = document.getElementById("smalls").getElementsByTagName("a");
 
@@ -109,6 +110,7 @@ class Rooms {
             var img = this.getElementsByTagName("img")[0]
             galleryImg.src = img.src;
             galleryImg.attributes['title'] = img.attributes['title'];
+            galleryLnk.attributes["href"].value = img.src;
             galleryDsc.innerHTML = descs[this.ord];
             e.preventDefault();
             return false;

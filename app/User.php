@@ -83,12 +83,13 @@ class User {
   public function getBallotPriorityForDB() {
     // Returns the ballot priority string, for looking up in DB
     switch($this->data['priority']){
-      //Third years abroad are treated like 2nd years
-      case "SCHOLARTHIRDABROAD":
-      case "THIRDYEARABROAD":
+      //Third years abroad are treated like 2nd years, with access to 3rd year groups too.
       case "SCHOLARSECOND":
       case "SECONDYEAR":
         return "'SCHOLARSECOND','SECONDYEAR', 'THIRDYEARABROAD', 'SCHOLARTHIRDABROAD'";
+      case "SCHOLARTHIRDABROAD":
+      case "THIRDYEARABROAD":
+        return "'SCHOLARSECOND','SECONDYEAR', 'THIRDYEARABROAD', 'SCHOLARTHIRDABROAD', 'SCHOLARTHIRD', 'THIRDYEARABROAD'";
       case "SCHOLARTHIRD":
       case "THIRDYEAR":
         return "'SCHOLARTHIRD','THIRDYEAR', 'THIRDYEARABROAD', 'SCHOLARTHIRDABROAD'";
