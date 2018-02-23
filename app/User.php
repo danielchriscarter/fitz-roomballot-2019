@@ -176,6 +176,12 @@ class User {
                $group->getBallotPriority() == Group::SECONDYEAR
             || $group->getBallotPriority() == Group::THIRDYEAR
             )
+          ) || ( //Allow 2nd years to ballot with 3rd years abroad
+            $this->getBallotPriority() == Group::SECONDYEAR &&
+            $group->getBallotPriority() == Group::THIRDYEARABROAD
+          ) || ( //Allow 3rd years to ballot with 3rd years abroad
+            $this->getBallotPriority() == Group::THIRDYEAR &&
+            $group->getBallotPriority() == Group::THIRDYEARABROAD
           );
     }
   }
