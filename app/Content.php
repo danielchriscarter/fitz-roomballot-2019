@@ -124,10 +124,16 @@ class Content {
   }
 
   private static function order(){
-    $result = Database::getInstance()->query("SELECT `seed` FROM `ballot_seed` WHERE `id`=0");
-    if($result->num_rows > 0){ ?>
+    $noErrors = isset($_GET['noerrors']);
+
+    if(!$noErrors && count(Database::getInstance()->fetch("ballot_errata")) > 0){
+      Groups::HTMLsuccess("The ballot you are viewing below is with ammendments. <a href='?noerrors'>Click here to view the ballot as it was originally drawn.</a>");
+    }
+
+    $seedQuery = Database::getInstance()->fetch("ballot_seed");
+    if(count($seedQuery) == 1){ ?>
       <div class="container">
-        <?= BallotMaker::makeBallot(); ?>
+        <?= BallotMaker::makeBallot(null, !$noErrors); ?>
       </div>
 <?  }else{
       Groups::HTMLerror("The ballot has not been drawn yet. See <a href='/timetable'>the Ballot Timetable</a> for when this will happen.");
