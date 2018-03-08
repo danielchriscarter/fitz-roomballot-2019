@@ -92,7 +92,7 @@ class Layout {
 
     <footer class="footer">
       <div class="container">
-        <p class="text-muted">Fitz JCR Housing Ballot System <?php echo Version::getVersion(); ?></p>
+        <p class="text-muted"><a href="https://github.com/CHTJonas/roomballot">Fitz JCR Housing Ballot System <?php echo Version::getVersion(); ?></a></p>
       </div>
     </footer>
   </body>
