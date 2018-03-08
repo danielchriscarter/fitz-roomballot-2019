@@ -80,7 +80,7 @@ class BallotMaker{
           <tr>
             <td class="col-md-1" style="text-align: right;"><?= $ballotPosition++; ?></td>
             <td class="col-md-8"><?= join("<br />", array_map(function($member){
-              return $member['name']." (".$member['crsid'].")";
+              return $member['name'];
             }, $group->getMemberList())); ?></td>
             <td class="col-md-3"><?= $group->getID(); ?></td>
           </tr>
