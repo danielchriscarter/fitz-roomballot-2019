@@ -8,12 +8,12 @@ Roomballot was written by:
 * Tom Benn (JCR Webmaster 2017)
 
 ## Installation
-1. Run `git clone https://github.com/CHTJonas/roomballot.git` in a terminal.
+1. Run `git clone https://github.com/fitzjcr/roomballot-old.git` in a terminal.
 2. Edit `.htaccess.example` and `app/Environment.php.example` as necessary.
 3. Remove the `.example` part.
 
 ## Contributing
-You are cordially invited to contribute to this project! Please see [Code of Conduct](https://github.com/CHTJonas/roomballot/blob/master/CODE_OF_CONDUCT.md) and [Contributing](https://github.com/CHTJonas/roomballot/blob/master/CONTRIBUTING.md) for more information.
+You are cordially invited to contribute to this project! Please see [Code of Conduct](https://github.com/fitzjcr/roomballot-old/blob/master/CODE_OF_CONDUCT.md) and [Contributing](https://github.com/fitzjcr/roomballot-old/blob/master/CONTRIBUTING.md) for more information.
 
 ## License & Legal
 The Fitzwilliam College JCR Room Balloting System is released as open source/libre software under Version 3 of the GNU General Public License. See the LICENSE file for the full details, but to summarise:
