@@ -1,3 +1,8 @@
+⚠️ **WARNING**:
+This project is deprecated and no longer maintained. You can find the new version [here](https://github.com/fitzjcr/roomballot).
+
+---
+
 # Fitz JCR Housing Ballot System
 This is the code repository for Fitzwilliam College JCR's online Room & Housing Ballot System. It is currently a work in progress and we do not have an estimated project release date.
 
