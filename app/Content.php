@@ -127,7 +127,7 @@ class Content {
     $noErrors = isset($_GET['noerrors']);
 
     if(!$noErrors && count(Database::getInstance()->fetch("ballot_errata")) > 0){
-      Groups::HTMLsuccess("The ballot you are viewing below is with ammendments. <a href='?noerrors'>Click here to view the ballot as it was originally drawn.</a>");
+      Groups::HTMLsuccess("The ballot you are viewing below is with amendments. <a href='?noerrors'>Click here to view the ballot as it was originally drawn.</a>");
     }
 
     $seedQuery = Database::getInstance()->fetch("ballot_seed");

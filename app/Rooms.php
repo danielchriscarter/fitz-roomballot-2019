@@ -5,7 +5,7 @@ require_once "lib/Michelf/SmartyPants.php";
 class Rooms {
   public static function HTMLroomSelector(){ ?>
     <div class='container'>
-      <img src='https://media.fitzjcr.com/housing/availablerooms.png' width="406" height="576" usemap="#map" />
+      <img src='https://roomballot.fitzjcr.com/include/content/availablerooms.png' width="406" height="576" usemap="#map" />
       <map name="map">
       <area shape="rect" coords="30,115,59,170" alt="L Staircase" href="https://roomballot.fitzjcr.com/rooms/fellowscourt" />
       <area shape="rect" coords="29,228,59,275" alt="N Staircase" href="https://roomballot.fitzjcr.com/rooms/fellowscourt" />
