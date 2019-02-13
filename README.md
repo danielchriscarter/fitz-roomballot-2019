@@ -4,13 +4,16 @@ This project is deprecated and no longer maintained. You can find the new versio
 ---
 
 # Fitz JCR Housing Ballot System
-This is the code repository for Fitzwilliam College JCR's online Room & Housing Ballot System. It is currently a work in progress and we do not have an estimated project release date.
+This is the code repository for Fitzwilliam College JCR's online Room & Housing Ballot System.
+
+There is a long-term project to replace this system with a new system [here](https://github.com/fitzjcr/roomballot). This repository holds the version of the previous system which is in use for the 2019 ballot.
 
 The app itself is written in PHP and is designed to run on the SRCF's web server, but in theory it should be easily deployed elsewhere too. The authentication uses the `$_SERVER['REMOTE_USER']` PHP variable and is designed to work seamlessly with the Raven single sign-on service at the University of Cambridge, however it should be easily adaptable to any other kind of authentication backend.
 
 Roomballot was written by:
 * Charlie Jonas (JCR Webmaster 2016)
 * Tom Benn (JCR Webmaster 2017)
+* Daniel Carter (JCR Webmaster 2018)
 
 ## Installation
 1. Run `git clone https://github.com/fitzjcr/roomballot-old.git` in a terminal.
@@ -18,7 +21,7 @@ Roomballot was written by:
 3. Remove the `.example` part.
 
 ## Contributing
-You are cordially invited to contribute to this project! Please see [Code of Conduct](https://github.com/fitzjcr/roomballot-old/blob/master/CODE_OF_CONDUCT.md) and [Contributing](https://github.com/fitzjcr/roomballot-old/blob/master/CONTRIBUTING.md) for more information.
+If you wish to contribute to the room ballot project, please see the new version's page [here](https://github.com/fitzjcr/roomballot). This version will no longer be updated, except for minor fixes to keep the system working until the new system is in place.
 
 ## License & Legal
 The Fitzwilliam College JCR Room Balloting System is released as open source/libre software under Version 3 of the GNU General Public License. See the LICENSE file for the full details, but to summarise:
