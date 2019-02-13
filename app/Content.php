@@ -60,7 +60,7 @@ class Content {
   private static function timetable() {
     Timetable::HTMLtop();
 
-    $queryString = "SELECT *  FROM `timetable`";
+    $queryString = "SELECT *  FROM `timetable` ORDER BY `date`";
     $result = Database::getInstance()->query($queryString);
     while ($row = $result->fetch_assoc()) {
       $dateObj = new DateTime($row["date"]);

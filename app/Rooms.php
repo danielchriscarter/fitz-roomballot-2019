@@ -44,14 +44,15 @@ class Rooms {
           <p>
             <?= $desc; ?>
           </p>
+          <br /> <br />
+    <?    if($quotes->num_rows > 0){ ?>
+          <h2>Quotes</h2>
+          <div>
+            <?= Rooms::HTMLquoteView($quotes); ?>
+          </div>
+<?    } ?>
         </div>
       </div>
-<?    if($quotes->num_rows > 0){ ?>
-        <h2>Quotes</h2>
-        <div>
-          <?= Rooms::HTMLquoteView($quotes); ?>
-        </div>
-<?    } ?>
     </div>
 <?}
   public static function HTMLquoteView($quotes){ 
