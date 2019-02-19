@@ -142,7 +142,8 @@ class Content {
 
   private static function admin(){
     $user = new User();
-    if($user->getCRSID() != Environment::admin_crsid){
+    if(!in_array($user->getCRSID(),Environment::admins)) {
+        //if($user->getCRSID() != Environment::admin_crsid){
       Groups::HTMLerror("You do not have admin permission");
       return;
     } ?>

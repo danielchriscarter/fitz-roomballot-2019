@@ -5,8 +5,12 @@ class Environment {
   // app enviromental variables
   const app_hostname = "roomballot.fitzjcr.com";
 
+  // Deprecated feature!
   // one CRSid that can take admin action
   const admin_crsid = "abcd1234";
+
+  // Many CRSids that can take admin action
+  const admins = array("abcd1234", "efgh5678");
 
   // set the following to true and add a message to disable the site to visitors
   const maint_mode = true;

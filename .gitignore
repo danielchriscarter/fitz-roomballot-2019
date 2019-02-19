@@ -1,5 +1,5 @@
 .DS_Store
-app/Environment*
+app/Environment.php
 .htaccess
 register/.htaccess
 include/content/

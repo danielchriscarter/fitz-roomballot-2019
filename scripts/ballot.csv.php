@@ -2,6 +2,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+header("Content-Type: text/plain");
+
 require_once("../app/Database.php");
 require_once("../app/Shuffle.php");
 require_once("../app/Group.php");
