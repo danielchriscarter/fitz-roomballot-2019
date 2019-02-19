@@ -1,3 +1,25 @@
+<?php
+$OPEN = False;
+
+require_once "../app/Database.php";
+
+function HTMLerror(string $string){ ?>
+  <div class="container">
+    <div class="alert alert-danger">
+    <?= $string; ?>
+    </div>
+  </div>
+<? }
+
+function HTMLsuccess(string $string){ ?>
+  <div class="container">
+    <div class="alert alert-success">
+    <?= $string; ?>
+    </div>
+  </div>
+<? }
+?>
+
 <!DOCTYPE html>
 <head>
   <title>Fitzwilliam JCR Room Ballot Registration</title>
@@ -12,6 +34,7 @@
   <div class="container">
     <h1>Fitzwilliam JCR Room Ballot Registration</h1>
 
+<? if($OPEN) { ?>
     <p>Please enter your details below</p>
     <form method="POST">
       Full Name: <input type="text" name="name" /> <br />
@@ -33,29 +56,16 @@
 
       <input type="checkbox" name="scholar" />
       <label for="consent">Please tick this box if you are an academic or organ scholar</label><br />
-      
+
       <input type="submit" name="submit" value="Submit" />
-  </div>
 
-<?php
-
-require_once "../app/Database.php";
-
-function HTMLerror(string $string){ ?>
-  <div class="container">
-    <div class="alert alert-danger">
-    <?= $string; ?>
-    </div>
-  </div>
 <? }
-
-function HTMLsuccess(string $string){ ?>
-  <div class="container">
-    <div class="alert alert-success">
-    <?= $string; ?>
-    </div>
+   else {
+       HTMLerror("Ballot registration is now closed");
+   }
+?>
   </div>
-<? }
+<?
 
 $SCHOLAR = array(
     "FIRSTYEAR" => "FIRSTYEAR",
