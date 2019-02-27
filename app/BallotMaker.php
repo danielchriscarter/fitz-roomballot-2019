@@ -7,10 +7,10 @@ class BallotMaker{
   public static function makeBallot($seed = null, $withErrata = false, $formatCSV = false){
       $ballotPriorities = ["SCHOLAR%", "SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
       $prettyNames = [
-        "SCHOLAR%" => "Scholar's Individual Ballot",
-        "SECONDYEAR" => "Second Year's and Third Years Abroad",
-        "THIRDYEAR" => "Third Year's With Confirmed Fourth",
-        "FIRSTYEAR" => "First Year's"
+        "SCHOLAR%" => "Scholars' Individual Ballot",
+        "SECONDYEAR" => "Second Years and Third Years Abroad",
+        "THIRDYEAR" => "Third Years With Confirmed Fourth",
+        "FIRSTYEAR" => "First Years"
       ]; 
       $scholarGroup = [
         "SECONDYEAR" => "SCHOLARSECOND",
