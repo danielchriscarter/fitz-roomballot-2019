@@ -1,5 +1,5 @@
 <?php
-$OPEN = False;
+$OPEN = True;
 
 require_once "../app/Database.php";
 
@@ -37,12 +37,12 @@ function HTMLsuccess(string $string){ ?>
 <? if($OPEN) { ?>
     <p>Please enter your details below</p>
     <form method="POST">
-      Full Name: <input type="text" name="name" /> <br />
+      Full Name: <input type="text" name="name" /> <br /> <br />
       Current year: <select name='year'> <br />
 	<option value="">Please select</option>
 	<option value="FIRSTYEAR">First year</option>
 	<option value="SECONDYEAR">Second year</option>
-	<option value="THIRDYEAR">Third year</option>
+	<option value="THIRDYEAR">Third year or above</option>
 	<option value="THIRDYEARABROAD">Third year (currently living abroad)</option>
       </select> <br />
       <br />
@@ -54,9 +54,6 @@ function HTMLsuccess(string $string){ ?>
       <input type="checkbox" name="consent" />
       <label for="consent">I consent to my data being used for the Fitzwilliam JCR Room Ballot</label><br />
 
-      <input type="checkbox" name="scholar" />
-      <label for="consent">Please tick this box if you are an academic or organ scholar</label><br />
-
       <input type="submit" name="submit" value="Submit" />
 
 <? }
@@ -67,6 +64,7 @@ function HTMLsuccess(string $string){ ?>
   </div>
 <?
 
+// Deprecatedx
 $SCHOLAR = array(
     "FIRSTYEAR" => "FIRSTYEAR",
     "SECONDYEAR" => "SCHOLARSECOND",
@@ -84,12 +82,16 @@ if(isset($_POST["submit"])) {
                         $query = "SELECT * FROM `ballot_individuals` WHERE crsid ='".$crsid."';";
                         $result = Database::getInstance()->query($query);
                         if($result->num_rows == 0) {
-                            $year = $_POST["year"];
-                            if(isset($_POST["scholar"])) {
-                                $year = $SCHOLAR[$year];
-                            }
-                            $query = "INSERT INTO ballot_individuals VALUES(".mt_rand().", '".$_POST["name"]."', '".$crsid."', NULL, 0, NULL, '".$year."', '".$_POST["proxy"]."');";
-                            $res = Database::getInstance()->query($query);
+                            $res = Database::getInstance()->insert("ballot_individuals", [
+                                "id" => mt_rand(),
+                                "name" => $_POST["name"],
+                                "crsid" => $crsid,
+                                "groupid" => null,
+                                "searching" => 0,
+                                "requesting" => null,
+                                "priority" => $_POST["year"],
+                                "proxy" => $_POST["proxy"]
+                            ]);
                             if($res){
                                 HTMLsuccess("You have now registered for the ballot");
                             }
