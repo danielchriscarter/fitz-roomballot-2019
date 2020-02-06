@@ -11,7 +11,7 @@ class Rooms {
       <area shape="rect" coords="29,228,59,275" alt="N Staircase" href="https://roomballot.fitzjcr.com/rooms/fellowscourt" />
       <area shape="rect" coords="110,275,148,303" alt="P Staircase" href="https://roomballot.fitzjcr.com/rooms/fellowscourt" />
       <area shape="rect" coords="22,302,66,356" alt="Q Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
-      <area shape="rect" coords="22,357,68,415" alt="S Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
+      <area shape="rect" coords="22,357,68,415" alt="R Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
       <area shape="rect" coords="26,418,60,494" alt="S Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
       <area shape="rect" coords="61,475,118,514" alt="T Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
       <area shape="rect" coords="122,475,143,532" alt="U Staircase" href="https://roomballot.fitzjcr.com/rooms/gatehousecourt" />
