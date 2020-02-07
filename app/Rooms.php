@@ -5,13 +5,17 @@ require_once "lib/Michelf/SmartyPants.php";
 class Rooms {
   public static function HTMLroomSelector(){ ?>
     <div class='container'>
-      <img src='https://roomballot.fitzjcr.com/include/content/availablerooms.png' width="406" height="576" usemap="#map" />
+      <h4>Click <a href="https://roomballot.fitzjcr.com/rooms/wolfsoncourt">here</a> for information and photos about <strong>Wolfson Court</strong>.</h4>
+<? /* Changed ballot image for this year due to refurbishment
+      <img src='https://roomballot.fitzjcr.com/include/content/availablerooms.png' width="406" height="576" usemap="#map" /> */ ?>
+      <img src='https://roomballot.fitzjcr.com/include/content/availablerooms_2020.png' width="406" height="576" usemap="#map" />
       <map name="map">
       <area shape="rect" coords="30,115,59,170" alt="L Staircase" href="https://roomballot.fitzjcr.com/rooms/fellowscourt" />
       <area shape="rect" coords="29,228,59,275" alt="N Staircase" href="https://roomballot.fitzjcr.com/rooms/fellowscourt" />
       <area shape="rect" coords="110,275,148,303" alt="P Staircase" href="https://roomballot.fitzjcr.com/rooms/fellowscourt" />
+      <? /* Q and R not in ballot for this year
       <area shape="rect" coords="22,302,66,356" alt="Q Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
-      <area shape="rect" coords="22,357,68,415" alt="R Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
+      <area shape="rect" coords="22,357,68,415" alt="R Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" /> */ ?>
       <area shape="rect" coords="26,418,60,494" alt="S Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
       <area shape="rect" coords="61,475,118,514" alt="T Staircase" href="https://roomballot.fitzjcr.com/rooms/newcourt" />
       <area shape="rect" coords="122,475,143,532" alt="U Staircase" href="https://roomballot.fitzjcr.com/rooms/gatehousecourt" />
