@@ -105,6 +105,10 @@ class User {
     return $this->data['priority'] == "SCHOLARSECOND" || $this->data['priority'] == "SCHOLARTHIRD" || $this->data['priority'] == "SCHOLARTHIRDABROAD";
   }
 
+  public function getProxyName() {
+      return $this->data['proxy'];
+  }
+
   //
   // getGroupId is deprecated
   //  

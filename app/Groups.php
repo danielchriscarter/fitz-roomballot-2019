@@ -5,6 +5,7 @@ class Groups {
   public static function HTMLtop($user) { ?>
     <div class="container">
     <h2>Welcome, <?= $user->getName(); ?></h2>
+      <p> Your proxy is <?= $user->getProxyName(); ?></p>
     <p>
 <?        if($user != null && !$user->isIndividual()){
       $owner = $user->ownsGroup(); ?>

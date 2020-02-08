@@ -32,7 +32,7 @@ class Rooms {
     $spec = SmartyPants::defaultTransform($spec);
 
     $desc = Markdown::defaultTransform($room['description']);
-    $desc = SmartyPants::defaultTransform($room['description']);
+    $desc = SmartyPants::defaultTransform($desc);
   ?>
     <div class='container'>
       <h2><?= $room['name']; ?></h2>
