@@ -1,5 +1,5 @@
 <?php
-$OPEN = True;
+$OPEN = False;
 
 require_once "../app/Database.php";
 

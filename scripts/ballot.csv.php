@@ -2,13 +2,22 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-header("Content-Type: text/plain");
+$httpHeader = "Content-Type: text/csv; charset=utf-8";
+
+if (isset($_GET["format"])) {
+    if ($_GET["format"] === "plain") {
+        $httpHeader = "Content-Type: text/plain; charset=utf-8";
+    }
+}
+
+header($httpHeader);
 
 require_once("../app/Database.php");
 require_once("../app/Shuffle.php");
 require_once("../app/Group.php");
 
-$ballotPriorities = ["SCHOLAR%", "SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
+// $ballotPriorities = ["SCHOLAR%", "SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
+$ballotPriorities = ["SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
 $prettyNames = [
   "SCHOLAR%" => "Scholars' Individual Ballot",
   "SECONDYEAR" => "Second Years and Third Years Abroad",
@@ -70,7 +79,7 @@ foreach($ballotPriorities as $ballotPriority){
   $ballotOrder = $shuffler->shuffle($groups);
   foreach($ballotOrder["groups"] as $group){
       foreach($group->getMemberList() as $person){
-        echo "$ballotPosition, ".$person['name'].", ".$group->getID()."\n";
+        echo "$ballotPosition,".$person['name'].",".$group->getID()."\n";
       }
       $ballotPosition++;
       echo "\n";

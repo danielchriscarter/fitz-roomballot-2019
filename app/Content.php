@@ -209,7 +209,7 @@ class Content {
           if(isset($_GET['final'])){
             //Force-write seed to database - if it already exists, INSERT will fail
             $result = Database::getInstance()->query("INSERT INTO `ballot_seed` (`id`, `seed`) VALUES (0, $seed)", true);
-?>          <a href="/scripts/ballot.csv.php">Get ballot spreadsheet</a><br /> <?
+?>          <a href="/scripts/ballot.csv.php">Get ballot spreadsheet</a> (or view <a href="/scripts/ballot.csv.php?format=plain">plain text version</a>)<br /> <?
             BallotMaker::makeBallot();
           }else{
             BallotMaker::makeBallot($seed); //Simulate ballot
@@ -224,7 +224,7 @@ class Content {
     }else{ ?>
       <a href="?action=dbfix">Check and fix DB (null groups, incorrect counts)</a><br />
       <a href="?action=ballot">Perform a ballot (or a mock ballot)</a></br />
-      <a href="/scripts/ballot.csv.php">Get ballot spreadsheet</a>
+      <a href="/scripts/ballot.csv.php">Get ballot spreadsheet</a> (or view <a href="/scripts/ballot.csv.php?format=plain">plain text version</a>)
 <?    }
 
 ?>
