@@ -5,7 +5,8 @@ require_once("Shuffle.php");
 
 class BallotMaker{
   public static function makeBallot($seed = null, $withErrata = false, $formatCSV = false){
-      $ballotPriorities = ["SCHOLAR%", "SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
+//      $ballotPriorities = ["SCHOLAR%", "SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
+      $ballotPriorities = ["SECONDYEAR", "THIRDYEAR", "FIRSTYEAR"];
       $prettyNames = [
         "SCHOLAR%" => "Scholars' Individual Ballot",
         "SECONDYEAR" => "Second Years and Third Years Abroad",
